@@ -70,6 +70,7 @@ ifeq ($(TARGET_BUILD_TYPE),debug)
 endif
 
 LOCAL_LDLIBS := -llog
+LOCAL_LDFLAGS += -Wl,-z,max-page-size=16384
 include $(BUILD_SHARED_LIBRARY)
 
 ### DEAMONIC LIB ###
@@ -82,5 +83,6 @@ LOCAL_SRC_FILES := $(commonSources) \
                     JNISupport.c
 LOCAL_MODULE := jdns_sd
 LOCAL_CFLAGS := $(commonFlags)
+LOCAL_LDFLAGS += -Wl,-z,max-page-size=16384
 LOCAL_EXPORT_C_INCLUDE_DIRS := external/mdnsresponder/mDNSShared
 include $(BUILD_SHARED_LIBRARY)
