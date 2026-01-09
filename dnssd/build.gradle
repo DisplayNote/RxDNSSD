@@ -53,7 +53,7 @@ dependencies {
 
 ext {
     // Provide your own coordinates here
-    PUBLISH_GROUP_ID = 'com.github.andriydruk'
+    PUBLISH_GROUP_ID = rootProject.ext.groupId
     PUBLISH_ARTIFACT_ID = 'dnssd'
 }
 

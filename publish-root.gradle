@@ -1,0 +1,13 @@
+ext {
+    groupId = 'com.displaynote.dnssdtest'
+    mavenCentralVersion = System.getenv("PUBLISH_VERSION") ?: '0.9.28'
+    artifactoryMavenUser = System.getenv("MAVEN_ARTIFACTORY_USERNAME") ?: displaynoteMavenArtifactoryUsername
+    artifactoryMavenPass = System.getenv("MAVEN_ARTIFACTORY_PASSWORD") ?: displaynoteMavenArtifactoryPassword
+    artifactoryDeployerUser = System.getenv("DEPLOYER_ARTIFACTORY_USERNAME") ?: displaynoteDeployerArtifactoryUsername
+    artifactoryDeployerPass = System.getenv("DEPLOYER_ARTIFACTORY_PASSWORD") ?: displaynoteDeployerArtifactoryPassword
+    artifactoryUrl = System.getenv("DEPLOYER_ARTIFACTORY_URL") ?: displaynoteDeployerArtifactoryUrl
+
+
+    artifactoryReleaseUrl  = "${artifactoryUrl}/libs-release-local"
+    artifactorySnapshotUrl = "${artifactoryUrl}/libs-snapshot-local"
+}

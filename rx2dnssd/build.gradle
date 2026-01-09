@@ -26,8 +26,11 @@ android {
 }
 
 dependencies {
-    api project(':dnssd')
-    //api "com.github.andriydruk:dnssd:$mavenCentralVersion"
+    // uncomment this line for local building, comment for publishing
+    //api project(':dnssd')
+
+    // uncomment this line for publishing, comment for local building
+    api "${rootProject.ext.groupId}:dnssd:${rootProject.ext.mavenCentralVersion}"
 
     // Transitively export that dependencies to other modules
     api 'io.reactivex.rxjava2:rxandroid:2.1.1'
@@ -48,7 +51,7 @@ dependencies {
 }
 
 ext {
-    PUBLISH_GROUP_ID = 'com.github.andriydruk'
+    PUBLISH_GROUP_ID = rootProject.ext.groupId
     PUBLISH_ARTIFACT_ID = 'rx2dnssd'
 }
 

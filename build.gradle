@@ -14,10 +14,26 @@ buildscript {
     }
 }
 
+apply from: "${rootDir}/publish-root.gradle"
+
 allprojects {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url "${rootProject.ext.artifactoryUrl}/libs-release"
+            credentials {
+                username = rootProject.ext.artifactoryMavenUser
+                password = rootProject.ext.artifactoryMavenPass
+            }
+        }
+        maven {
+            url "${rootProject.ext.artifactoryUrl}/libs-snapshot"
+            credentials {
+                username = rootProject.ext.artifactoryMavenUser
+                password = rootProject.ext.artifactoryMavenPass
+            }
+        }
     }
 }
 

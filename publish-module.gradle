@@ -1,14 +1,37 @@
-task androidSourcesJar(type: Jar) {
-    archiveClassifier.set('sources')
-    if (project.plugins.findPlugin("com.android.library")) {
-        // For Android libraries
-        from android.sourceSets.main.java.srcDirs
-    }
-}
-
-artifacts {
-    archives androidSourcesJar
-}
+apply plugin: 'maven-publish'
 
 group = PUBLISH_GROUP_ID
-version = '0.9.20'
+version = rootProject.ext.mavenCentralVersion
+
+afterEvaluate {
+    publishing {
+        publications {
+            release(MavenPublication) {
+                groupId = PUBLISH_GROUP_ID
+                artifactId = PUBLISH_ARTIFACT_ID
+                version = rootProject.ext.mavenCentralVersion
+
+                // Publica el AAR del variant release
+                from components.release
+                // Evita publicar Gradle Module Metadata (a veces da problemas con Artifactory/proxies)
+                suppressAllPomMetadataWarnings()
+            }
+        }
+
+        repositories {
+            maven {
+                def v = rootProject.ext.mavenCentralVersion.toString()
+                def isSnapshot = v.endsWith("-SNAPSHOT")
+
+                url = uri(isSnapshot
+                        ? rootProject.ext.artifactorySnapshotUrl
+                        : rootProject.ext.artifactoryReleaseUrl)
+
+                credentials {
+                    username = rootProject.ext.artifactoryDeployerUser
+                    password = rootProject.ext.artifactoryDeployerPass
+                }
+            }
+        }
+    }
+}
