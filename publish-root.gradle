@@ -1,6 +1,6 @@
 ext {
-    groupId = 'com.displaynote.dnssdtest'
-    mavenCentralVersion = System.getenv("PUBLISH_VERSION") ?: '0.9.28'
+    groupId = 'com.displaynote.dnssd'
+    displaynotePublishVersion = System.getenv("PUBLISH_VERSION") ?: '0.9.21'
     artifactoryMavenUser = System.getenv("MAVEN_ARTIFACTORY_USERNAME") ?: displaynoteMavenArtifactoryUsername
     artifactoryMavenPass = System.getenv("MAVEN_ARTIFACTORY_PASSWORD") ?: displaynoteMavenArtifactoryPassword
     artifactoryDeployerUser = System.getenv("DEPLOYER_ARTIFACTORY_USERNAME") ?: displaynoteDeployerArtifactoryUsername

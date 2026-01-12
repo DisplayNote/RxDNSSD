@@ -1,7 +1,7 @@
 apply plugin: 'maven-publish'
 
 group = PUBLISH_GROUP_ID
-version = rootProject.ext.mavenCentralVersion
+version = rootProject.ext.displaynotePublishVersion
 
 afterEvaluate {
     publishing {
@@ -9,7 +9,7 @@ afterEvaluate {
             release(MavenPublication) {
                 groupId = PUBLISH_GROUP_ID
                 artifactId = PUBLISH_ARTIFACT_ID
-                version = rootProject.ext.mavenCentralVersion
+                version = rootProject.ext.displaynotePublishVersion
 
                 // Publica el AAR del variant release
                 from components.release
@@ -20,7 +20,7 @@ afterEvaluate {
 
         repositories {
             maven {
-                def v = rootProject.ext.mavenCentralVersion.toString()
+                def v = rootProject.ext.displaynotePublishVersion.toString()
                 def isSnapshot = v.endsWith("-SNAPSHOT")
 
                 url = uri(isSnapshot

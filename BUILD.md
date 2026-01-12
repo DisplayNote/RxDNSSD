@@ -8,7 +8,7 @@ dependencies {
     api project(':dnssd')
 
     // uncomment this line for publishing, comment for local building
-    // api "${rootProject.ext.groupId}:dnssd:${rootProject.ext.mavenCentralVersion}"
+    // api "${rootProject.ext.groupId}:dnssd:${rootProject.ext.displaynotePublishVersion}"
 
 [...]
 
@@ -20,6 +20,8 @@ Finally, build project
 ```
 gradle aR
 ```
+
+For testing, copy AARs from **rx2dnssd** and **dnssd** to your libs folder in app's template
 
 # PUBLISH INSTRUCTIONS
 
@@ -47,19 +49,20 @@ Then setup rxdnssd and rx2dnssd modules for deploying
 ```groovy
 dependencies {
     // uncomment this line for local building, comment for publishing
-    api project(':dnssd')
+    // api project(':dnssd')
 
     // uncomment this line for publishing, comment for local building
-    // api "${rootProject.ext.groupId}:dnssd:${rootProject.ext.mavenCentralVersion}"
+    api "${rootProject.ext.groupId}:dnssd:${rootProject.ext.displaynotePublishVersion}"
 
 [...]
 
 }
 ```
 
-And update version in publish-root.gradle
+And update version in publish-root.gradle (you can also use **PUBLISH_VERSION** environment var instead)
+
 ```groovy
-mavenCentralVersion = System.getenv("PUBLISH_VERSION") ?: '0.9.28'
+displaynotePublishVersion = System.getenv("PUBLISH_VERSION") ?: '0.9.21'
 ```
 
 Finally, call to publish

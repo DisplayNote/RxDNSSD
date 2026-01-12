@@ -27,10 +27,10 @@ android {
 
 dependencies {
     // uncomment this line for local building, comment for publishing
-    //api project(':dnssd')
+    api project(':dnssd')
 
     // uncomment this line for publishing, comment for local building
-    api "${rootProject.ext.groupId}:dnssd:${rootProject.ext.mavenCentralVersion}"
+    // api "${rootProject.ext.groupId}:dnssd:${rootProject.ext.displaynotePublishVersion}"
 
     // Transitively export that dependencies to other modules
     api 'io.reactivex:rxandroid:1.2.1'
