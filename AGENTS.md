@@ -21,7 +21,7 @@ Full per-module detail: `docs/modules/dnssd.md`, `docs/modules/rxdnssd.md`, `doc
 
 ## Run / build / test / lint
 
-Prerequisites: Android SDK, NDK 28.2.13676358, JDK 17. See `docs/runbooks/local-setup.md` for the full setup including a Windows/Git Bash `JAVA_HOME` gotcha.
+Prerequisites: Android SDK, NDK 28.2.13676358, JDK 11–16 (Gradle 7.0.2's wrapper doesn't support JDK 17+). See `docs/runbooks/local-setup.md` for the full setup including a Windows/Git Bash `JAVA_HOME` gotcha.
 
 ```bash
 ./gradlew clean build     # full build, all 4 modules
@@ -43,7 +43,7 @@ flowchart TD
     rx2 --> dnssd["dnssd (Java API + JNI + native core)"]
 ```
 
-- **`dnssd`**: `DNSSD` interface with two implementations — `DNSSDBindable` (talks to the system `mdnsd`/`nsd` daemon, deprecated by Google on API 31+) and `DNSSDEmbedded` (runs its own native mDNSResponder core via JNI, works API 14+). Native core under `dnssd/src/main/jni/mdnsresponder/` is vendored Apple source — do not hand-edit.
+- **`dnssd`**: `DNSSD` abstract class with two subclasses — `DNSSDBindable` (talks to the system `mdnsd`/`nsd` daemon, deprecated by Google on API 31+) and `DNSSDEmbedded` (runs its own native mDNSResponder core via JNI, works API 14+). Native core under `dnssd/src/main/jni/mdnsresponder/` is vendored Apple source — do not hand-edit.
 - **`rxdnssd`** / **`rx2dnssd`**: near-identical Rx wrappers (RxJava1 `Observable` vs RxJava2 `Flowable`) over `DNSSD`. They do not depend on each other.
 - **`app`**: sample activity (`DNSSDActivity`) showing the canonical `browse().compose(resolve()).compose(queryRecords())` chain.
 
@@ -52,7 +52,7 @@ Full diagrams (C4 + sequence): `docs/architecture.md`.
 ## Coding conventions (observed)
 
 - Package-private `Internal*` classes (`InternalDNSSD`, `InternalBrowseListener`, …) are native-method plumbing, never part of the public API surface — don't call them from outside `dnssd`.
-- Public interfaces (`DNSSD`, `RxDnssd`, `Rx2Dnssd`) are documented with Javadoc `@param`/`@return`; match that style when adding methods.
+- Public API types (`DNSSD` abstract class; `RxDnssd`, `Rx2Dnssd` interfaces) are documented with Javadoc `@param`/`@return`; match that style when adding methods.
 - `@Deprecated` methods (e.g. `queryRecords()` in both Rx wrappers, replaced by `queryIPRecords()`) are kept, not removed, for binary compatibility — follow that pattern rather than breaking existing consumers.
 - Tests: one JUnit4 test class per public entry point, using Mockito + PowerMock to stub native calls (`docs/runbooks/testing.md`).
 - Apache 2.0 license header on every source file — copy an existing file's header verbatim into new files.

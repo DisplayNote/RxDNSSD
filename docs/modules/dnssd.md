@@ -2,14 +2,14 @@
 
 ## Purpose and boundaries
 
-Lowest-level module. Provides a plain-Java DNS-SD API (`DNSSD` interface) plus the native mDNSResponder core that backs it. No RxJava dependency — `rxdnssd` and `rx2dnssd` both wrap this module and add nothing to it that isn't reactive plumbing.
+Lowest-level module. Provides a plain-Java DNS-SD API (`DNSSD` abstract class) plus the native mDNSResponder core that backs it. No RxJava dependency — `rxdnssd` and `rx2dnssd` both wrap this module and add nothing to it that isn't reactive plumbing.
 
 What belongs here: the `DNSSD` contract, its two implementations (`DNSSDBindable`, `DNSSDEmbedded`), the JNI bridge, and the vendored native core.
 What doesn't belong here: anything RxJava-specific, anything Android-app-specific (that's `app`).
 
 ## Public API
 
-- `DNSSD` (`dnssd/src/main/java/.../dnssd/DNSSD.java`) — interface with `register`, `browse`, `resolve`, `queryRecord`, `createRecordRegistrar`.
+- `DNSSD` (`dnssd/src/main/java/.../dnssd/DNSSD.java`) — abstract class with `register`, `browse`, `resolve`, `queryRecord`, `createRecordRegistrar`.
 - `DNSSDBindable` — implementation bound to the system `mdnsd`/`nsd` service (requires a `Context`). Deprecated on API 31+ by the OS itself (see `README.md`).
 - `DNSSDEmbedded` — implementation using the bundled native core, no `Context` required, works API 14+.
 - Listener interfaces: `BrowseListener`, `RegisterListener`, `ResolveListener`, `QueryListener`, `DomainListener`, `RegisterRecordListener`.
@@ -40,5 +40,5 @@ Tests live in `dnssd/src/test/java/.../dnssd/` (`DnssdTest`, `DNSSDEmbeddedTest`
 
 ## Extension points / typical changes
 
-- Adding a new DNS-SD operation: extend the `DNSSD` interface, then implement it in both `DNSSDBindable` and `DNSSDEmbedded`, then add the native method + JNI glue in `InternalDNSSD`/`JNISupport.c` if the Embedded path needs it.
+- Adding a new DNS-SD operation: add the method to the `DNSSD` abstract class, then override it in both `DNSSDBindable` and `DNSSDEmbedded`, then add the native method + JNI glue in `InternalDNSSD`/`JNISupport.c` if the Embedded path needs it.
 - Bumping the vendored mDNSResponder: replace files under `mdnsresponder/` from upstream Apple source; re-check `Android.mk` source lists still match; do not carry over unrelated Apple changes to Windows/Clients trees.

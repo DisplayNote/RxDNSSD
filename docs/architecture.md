@@ -42,15 +42,15 @@ C4Container
 C4Component
     title dnssd module — Components
 
-    Component(dnssdIface, "DNSSD (interface)", "Java", "register/browse/resolve/queryRecord/createRecordRegistrar")
+    Component(dnssdIface, "DNSSD (abstract class)", "Java", "register/browse/resolve/queryRecord/createRecordRegistrar")
     Component(bindable, "DNSSDBindable", "Java", "Talks to system mdnsd via bound AIDL service")
     Component(embedded, "DNSSDEmbedded", "Java", "Loads libjdns_sd_embedded.so, talks to InternalDNSSD")
     Component(internal, "InternalDNSSD + Internal*", "Java (package-private)", "Thin native-method declarations mirroring dns_sd.h")
     Component(jni, "JNISupport.c / DNSSD.java.h", "C (JNI)", "Bridges InternalDNSSD native calls to the C API below")
     Component(core, "mdnsresponder/ (vendored)", "C", "Apple's mDNSCore + mDNSPosix + mDNSShared — DO NOT hand-edit, see Gotchas in AGENTS.md")
 
-    Rel(bindable, dnssdIface, "implements")
-    Rel(embedded, dnssdIface, "implements")
+    Rel(bindable, dnssdIface, "extends")
+    Rel(embedded, dnssdIface, "extends")
     Rel(embedded, internal, "delegates native calls")
     Rel(internal, jni, "JNI native methods")
     Rel(jni, core, "calls into DNSServiceRegister/Browse/Resolve/QueryRecord etc.")
@@ -61,22 +61,26 @@ C4Component
 ```mermaid
 sequenceDiagram
     participant App
-    participant Rx2Dnssd
-    participant Rx2DnssdEmbedded
+    participant Rx2Dnssd as Rx2DnssdCommon
+    participant DNSSDEmbedded
     participant InternalDNSSD
     participant Native as libjdns_sd_embedded.so
 
     App->>Rx2Dnssd: browse("_http._tcp", "local.")
-    Rx2Dnssd->>Rx2DnssdEmbedded: browse()
-    Rx2DnssdEmbedded->>InternalDNSSD: native browse()
+    Rx2Dnssd->>DNSSDEmbedded: mDNSSD.browse()
+    DNSSDEmbedded->>InternalDNSSD: native browse()
     InternalDNSSD->>Native: DNSServiceBrowse()
     Native-->>InternalDNSSD: serviceFound/serviceLost callback
-    InternalDNSSD-->>Rx2DnssdEmbedded: BonjourService (partial)
+    InternalDNSSD-->>DNSSDEmbedded: BonjourService (partial)
     App->>Rx2Dnssd: .compose(resolve())
-    Rx2Dnssd->>Native: DNSServiceResolve()
+    Rx2Dnssd->>DNSSDEmbedded: mDNSSD.resolve()
+    DNSSDEmbedded->>InternalDNSSD: native resolve()
+    InternalDNSSD->>Native: DNSServiceResolve()
     Native-->>App: BonjourService (host, port)
     App->>Rx2Dnssd: .compose(queryRecords())
-    Rx2Dnssd->>Native: DNSServiceQueryRecord() (A/AAAA + TXT)
+    Rx2Dnssd->>DNSSDEmbedded: mDNSSD.queryRecord()
+    DNSSDEmbedded->>InternalDNSSD: native queryRecord()
+    InternalDNSSD->>Native: DNSServiceQueryRecord() (A/AAAA + TXT)
     Native-->>App: BonjourService (fully populated, or isLost()==true)
 ```
 
