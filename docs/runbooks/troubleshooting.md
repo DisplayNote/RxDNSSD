@@ -6,9 +6,9 @@ Cause: the `JAVA_HOME` environment variable contains literal double-quote charac
 
 Fix:
 ```bash
-export JAVA_HOME='C:\Program Files\Microsoft\jdk-17.0.7.7-hotspot'
+export JAVA_HOME='C:/Program Files/Microsoft/jdk-17.0.7.7-hotspot'
 ```
-(no embedded quotes in the value itself). Verify with `test -d "$JAVA_HOME" && echo ok`.
+(no embedded quotes in the value itself, and slash-separated so `./gradlew`'s `"$JAVA_HOME/bin/java"` check resolves correctly under Git Bash). Verify with `test -x "$JAVA_HOME/bin/java" && echo ok`.
 
 ## `JNI DETECTED ERROR IN APPLICATION: java_class == null`
 

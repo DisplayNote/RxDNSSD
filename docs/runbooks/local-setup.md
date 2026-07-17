@@ -13,9 +13,9 @@ If `./gradlew` fails with:
 ```
 ERROR: JAVA_HOME is set to an invalid directory: "C:\Program Files\Microsoft\jdk-17.0.7.7-hotspot"
 ```
-even though that directory exists, check whether `JAVA_HOME` in your shell holds **literal quote characters** as part of the value (common when it's set from a Windows `setx`/registry value copied with quotes into a Git Bash profile). Fix by re-exporting without quotes:
+even though that directory exists, check whether `JAVA_HOME` in your shell holds **literal quote characters** as part of the value (common when it's set from a Windows `setx`/registry value copied with quotes into a Git Bash profile). Fix by re-exporting without quotes and with slash-separated path (so `./gradlew`'s `"$JAVA_HOME/bin/java"` check resolves under Git Bash):
 ```bash
-export JAVA_HOME='C:\Program Files\Microsoft\jdk-17.0.7.7-hotspot'
+export JAVA_HOME='C:/Program Files/Microsoft/jdk-17.0.7.7-hotspot'
 ```
 See also `docs/runbooks/troubleshooting.md`.
 
