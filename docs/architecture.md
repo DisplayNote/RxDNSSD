@@ -14,7 +14,7 @@ C4Context
     System_Ext(lan, "Local network (mDNS multicast)", "Other DNS-SD advertisers/browsers on the same subnet")
 
     Rel(dev, rxdnssd, "implementation 'com.displaynote.dnssd:rx2dnssd:<version>' (Maven; or dnssd/rxdnssd instead)")
-    Rel(rxdnssd, mdnsd, "AIDL/bound service (Bindable only)")
+    Rel(rxdnssd, mdnsd, "Unix domain socket IPC via jdns_sd native lib (Bindable only)")
     Rel(rxdnssd, lan, "Multicast UDP 5353 (Embedded: own native core; Bindable: via daemon)")
 ```
 
@@ -43,7 +43,7 @@ C4Component
     title dnssd module — Components
 
     Component(dnssdIface, "DNSSD (abstract class)", "Java", "register/browse/resolve/queryRecord/createRecordRegistrar")
-    Component(bindable, "DNSSDBindable", "Java", "Talks to system mdnsd via bound AIDL service")
+    Component(bindable, "DNSSDBindable", "Java", "Loads libjdns_sd.so, talks to system mdnsd over a Unix domain socket (dnssd_client* IPC)")
     Component(embedded, "DNSSDEmbedded", "Java", "Loads libjdns_sd_embedded.so, talks to InternalDNSSD")
     Component(internal, "InternalDNSSD + Internal*", "Java (package-private)", "Thin native-method declarations mirroring dns_sd.h")
     Component(jni, "JNISupport.c / DNSSD.java.h", "C (JNI)", "Bridges InternalDNSSD native calls to the C API below")
@@ -88,7 +88,7 @@ sequenceDiagram
 
 `dnssd/build.gradle` wires `externalNativeBuild.ndkBuild` to `dnssd/src/main/jni/Android.mk`. Two native targets are built (see `Android.mk`):
 - `jdns_sd_embedded` — full mDNSCore + mDNSPosix + JNISupport, used by `DNSSDEmbedded`.
-- (bindable path uses the plain `dnssd_client*` shim files, no full core, talking to the system daemon over a Unix domain socket via IPC — see `mDNSShared/dnssd_ipc.c`).
+- `jdns_sd` — plain `dnssd_client*` shim files + JNISupport, no full core, used by `DNSSDBindable` (`super(context, "jdns_sd")`) to talk to the system daemon over a Unix domain socket via IPC — see `mDNSShared/dnssd_ipc.c`.
 
 NDK version is pinned per-module in `build.gradle` (`ndkVersion "28.2.13676358"` in `app` and `dnssd`).
 

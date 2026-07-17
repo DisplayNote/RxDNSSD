@@ -20,7 +20,7 @@ Everything under `Internal*` (`InternalDNSSD`, `InternalBrowseListener`, etc.) i
 
 ## Native layer
 
-- `dnssd/src/main/jni/Android.mk` — ndk-build script, builds `jdns_sd_embedded` (full mDNSCore + Posix + JNISupport) for the Embedded path.
+- `dnssd/src/main/jni/Android.mk` — ndk-build script, builds two shared libraries: `jdns_sd_embedded` (full mDNSCore + Posix + JNISupport) for the Embedded path, and `jdns_sd` (`dnssd_client*` IPC shim + JNISupport) for the Bindable path (`DNSSDBindable` loads it via `super(context, "jdns_sd")`).
 - `dnssd/src/main/jni/JNISupport.c` + `DNSSD.java.h` — hand-written JNI bridge. This is the only native file DisplayNote maintains directly.
 - `dnssd/src/main/jni/mdnsresponder/` — **vendored** copy of Apple's open-source mDNSResponder (mDNSCore, mDNSPosix, mDNSShared, plus unused mDNSWindows/Clients trees kept for reference). Do not hand-edit; see Gotchas in `AGENTS.md`.
 - `ndkVersion "28.2.13676358"` pinned in `dnssd/build.gradle`.
