@@ -6,9 +6,9 @@ Cause: the `JAVA_HOME` environment variable contains literal double-quote charac
 
 Fix:
 ```bash
-export JAVA_HOME='C:/Program Files/Microsoft/jdk-17.0.7.7-hotspot'
+export JAVA_HOME='C:/Program Files/Microsoft/jdk-11.0.25.9-hotspot'
 ```
-(no embedded quotes in the value itself, and slash-separated so `./gradlew`'s `"$JAVA_HOME/bin/java"` check resolves correctly under Git Bash). Verify with `test -x "$JAVA_HOME/bin/java" && echo ok`.
+(no embedded quotes in the value itself, and slash-separated so `./gradlew`'s `"$JAVA_HOME/bin/java"` check resolves correctly under Git Bash). Verify with `test -x "$JAVA_HOME/bin/java" && echo ok`. Note the Gradle 7.0.2 wrapper caps at Java 16 — JDK 17+ fails with an "Unsupported Java" error, so use a JDK 11–16 build here.
 
 ## `JNI DETECTED ERROR IN APPLICATION: java_class == null`
 

@@ -4,18 +4,18 @@
 
 - Android SDK with `compileSdkVersion 31` platform installed (module `app`; other modules use 30).
 - Android NDK **28.2.13676358** (pinned in `app/build.gradle` and `dnssd/build.gradle` via `ndkVersion`). `dnssd` needs the NDK because it builds native mDNSResponder code via `ndkBuild`.
-- JDK 17 minimum (no upper bound pinned; repo was built/tested with `jdk-17.0.7.7-hotspot` locally).
+- JDK 11–16. AGP 7.0.3 requires JDK 11+, and the Gradle 7.0.2 wrapper caps at Java 16 — it does not run on JDK 17+ ("Unsupported Java" error).
 - `local.properties` with `sdk.dir` pointing at your Android SDK (gitignored, create your own).
 
 ## Windows / Git Bash gotcha
 
 If `./gradlew` fails with:
 ```
-ERROR: JAVA_HOME is set to an invalid directory: "C:\Program Files\Microsoft\jdk-17.0.7.7-hotspot"
+ERROR: JAVA_HOME is set to an invalid directory: "C:\Program Files\Microsoft\jdk-11.0.25.9-hotspot"
 ```
 even though that directory exists, check whether `JAVA_HOME` in your shell holds **literal quote characters** as part of the value (common when it's set from a Windows `setx`/registry value copied with quotes into a Git Bash profile). Fix by re-exporting without quotes and with slash-separated path (so `./gradlew`'s `"$JAVA_HOME/bin/java"` check resolves under Git Bash):
 ```bash
-export JAVA_HOME='C:/Program Files/Microsoft/jdk-17.0.7.7-hotspot'
+export JAVA_HOME='C:/Program Files/Microsoft/jdk-11.0.25.9-hotspot'
 ```
 See also `docs/runbooks/troubleshooting.md`.
 
