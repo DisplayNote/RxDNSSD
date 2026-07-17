@@ -16,6 +16,10 @@ Please support Ukraine by lobbying your governments, protesting peacefully, and 
 ## Why I created this library?
 My [explanation](http://andriydruk.com/post/mdnsresponder/) about why jmDNS, Android NSD Services and Google Nearby API are not good enough, and why I maintain this library.
 
+## Working on this repo
+
+See [AGENTS.md](AGENTS.md) (or [CLAUDE.md](CLAUDE.md) for Claude Code) for the module map, architecture, build/test commands, and gotchas. Deeper docs live under [docs/](docs/).
+
 ## Hierarchy
 
 There are two version of mDNSReposder. 
