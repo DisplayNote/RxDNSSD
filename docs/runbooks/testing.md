@@ -2,7 +2,7 @@
 
 ## Test pyramid that actually exists
 
-Unit tests only, one file per module (`dnssd`, `rxdnssd`, `rx2dnssd`) — no instrumented/UI tests, no tests in `app`.
+Unit tests only, organized per module (`dnssd`, `rxdnssd`, `rx2dnssd`) — no instrumented/UI tests, no tests in `app`. `dnssd` has three test classes (one per public entry point); `rxdnssd`/`rx2dnssd` each have one.
 
 | Module | Test file(s) |
 |---|---|
