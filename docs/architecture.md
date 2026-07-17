@@ -13,7 +13,7 @@ C4Context
     System_Ext(mdnsd, "Android system mdnsd/nsd daemon", "OS-provided, used by *Bindable implementations")
     System_Ext(lan, "Local network (mDNS multicast)", "Other DNS-SD advertisers/browsers on the same subnet")
 
-    Rel(dev, rxdnssd, "implementation project(':rx2dnssd')")
+    Rel(dev, rxdnssd, "implementation 'com.displaynote.dnssd:{dnssd,rxdnssd,rx2dnssd}:<version>' (Maven)")
     Rel(rxdnssd, mdnsd, "AIDL/bound service (Bindable only)")
     Rel(rxdnssd, lan, "Multicast UDP 5353 (Embedded: own native core; Bindable: via daemon)")
 ```
