@@ -81,7 +81,7 @@ Full diagrams (C4 + sequence): `docs/architecture.md`.
 - **Two coordinate spaces**: historical Maven Central releases used `com.github.andriydruk`; this fork publishes as `com.displaynote.dnssd` (`publish-root.gradle`). Don't assume version numbers or artifact history are shared between the two.
 - **`DNSSDBindable`/`Rx*DnssdBindable` deprecated by the OS** on `targetSDK 31`+ (Android 12) — new integrations should default to the Embedded variants.
 - **Windows `JAVA_HOME` quoting bug**: see `docs/runbooks/troubleshooting.md` — a quoted env var value can make Gradle report a valid JDK directory as invalid.
-- **No GitHub Actions**: CI is CircleCI only (`circle.yml`); `.github/` only has an issue template.
+- **No GitHub Actions**: CI is CircleCI only (`circle.yml`); there's no workflow under `.github/workflows/` (`.github/` holds an issue template and `copilot-instructions.md`).
 
 ## Glossary
 

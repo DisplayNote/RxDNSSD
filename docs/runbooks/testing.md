@@ -30,4 +30,4 @@ Follow the existing per-module pattern: one test class per public entry point (`
 
 ## CI
 
-CircleCI (`circle.yml`) runs `./gradlew androidDependencies` (cache warm) then `./gradlew check`, and uploads `build/reports` + `build/test-results` for `dnssd`, `rxdnssd`, `rx2dnssd` (not `app`). There is no GitHub Actions workflow in `.github/` — only an issue template.
+CircleCI (`circle.yml`) runs `./gradlew androidDependencies` (cache warm) then `./gradlew check`, and uploads `build/reports` + `build/test-results` for `dnssd`, `rxdnssd`, `rx2dnssd` (not `app`). There is no GitHub Actions workflow under `.github/workflows/`; `.github/` also holds an issue template and `copilot-instructions.md`.
