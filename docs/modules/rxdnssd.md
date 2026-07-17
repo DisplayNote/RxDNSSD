@@ -2,7 +2,7 @@
 
 ## Purpose and boundaries
 
-RxJava 1 (`io.reactivex:rxjava:1.3.8`, `rxandroid:1.2.1`) wrapper over [[dnssd-module]]. Kept for consumers who haven't migrated off RxJava 1. **Do not add new features here that don't also land in `rx2dnssd`** — treat `rx2dnssd` as the canonical implementation and port changes across; see Gotchas in `AGENTS.md`.
+RxJava 1 (`io.reactivex:rxjava:1.3.8`, `rxandroid:1.2.1`) wrapper over [`dnssd`](dnssd.md). Kept for consumers who haven't migrated off RxJava 1. **Do not add new features here that don't also land in `rx2dnssd`** — treat `rx2dnssd` as the canonical implementation and port changes across; see Gotchas in `AGENTS.md`.
 
 ## Public API
 

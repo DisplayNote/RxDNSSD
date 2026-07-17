@@ -2,7 +2,7 @@
 
 ## Purpose and boundaries
 
-RxJava 2 (`io.reactivex.rxjava2:rxjava:2.2.21`, `rxandroid:2.1.1`) wrapper over [[dnssd-module]]. This is the module new integrations should use — the sample `app` module depends on it, not on `rxdnssd`.
+RxJava 2 (`io.reactivex.rxjava2:rxjava:2.2.21`, `rxandroid:2.1.1`) wrapper over [`dnssd`](dnssd.md). This is the module new integrations should use — the sample `app` module depends on it, not on `rxdnssd`.
 
 ## Public API
 
@@ -26,5 +26,5 @@ Test: `rx2dnssd/src/test/java/.../rx2dnssd/Rx2DnssdTest.java` (JUnit4 + Mockito 
 
 ## Extension points / typical changes
 
-- Adding a new query/browse variant: add to `Rx2Dnssd`, implement in both `Rx2DnssdBindable` and `Rx2DnssdEmbedded`, then port the same addition to `rxdnssd`'s `RxDnssd` (see [[rxdnssd-module]]) unless it's Flowable-specific.
+- Adding a new query/browse variant: add to `Rx2Dnssd`, implement in both `Rx2DnssdBindable` and `Rx2DnssdEmbedded`, then port the same addition to `rxdnssd`'s `RxDnssd` (see [`rxdnssd`](rxdnssd.md)) unless it's Flowable-specific.
 - Example usage patterns to follow are in `app/src/main/java/.../dnssdsamples/DNSSDActivity.java` — `browse().compose(resolve()).compose(queryRecords())` chain, subscribed on `Schedulers.io()`, observed on `AndroidSchedulers.mainThread()`.
