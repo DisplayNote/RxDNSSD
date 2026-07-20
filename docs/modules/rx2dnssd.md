@@ -27,4 +27,4 @@ Test: `rx2dnssd/src/test/java/.../rx2dnssd/Rx2DnssdTest.java` (JUnit4 + Mockito 
 ## Extension points / typical changes
 
 - Adding a new query/browse variant: add to `Rx2Dnssd`, implement in both `Rx2DnssdBindable` and `Rx2DnssdEmbedded`, then port the same addition to `rxdnssd`'s `RxDnssd` (see [`rxdnssd`](rxdnssd.md)) unless it's Flowable-specific.
-- Example usage patterns to follow are in `app/src/main/java/.../dnssdsamples/DNSSDActivity.java` — `browse().compose(resolve()).compose(queryRecords())` chain, subscribed on `Schedulers.io()`, observed on `AndroidSchedulers.mainThread()`.
+- Example usage patterns to follow are in `app/src/main/java/.../dnssdsamples/MainActivity.java` — `browse().compose(resolve()).compose(queryIPRecords())` chain, subscribed on `Schedulers.io()`, observed on `AndroidSchedulers.mainThread()`.

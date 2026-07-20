@@ -45,7 +45,7 @@ flowchart TD
 
 - **`dnssd`**: `DNSSD` abstract class with two subclasses — `DNSSDBindable` (talks to the system `mdnsd`/`nsd` daemon, deprecated by Google on API 31+) and `DNSSDEmbedded` (runs its own native mDNSResponder core via JNI, works API 14+). Native core under `dnssd/src/main/jni/mdnsresponder/` is vendored Apple source — do not hand-edit.
 - **`rxdnssd`** / **`rx2dnssd`**: near-identical Rx wrappers (RxJava1 `Observable` vs RxJava2 `Flowable`) over `DNSSD`. They do not depend on each other.
-- **`app`**: sample activity (`DNSSDActivity`) showing the canonical `browse().compose(resolve()).compose(queryRecords())` chain.
+- **`app`**: sample activity (`MainActivity`) showing the canonical `browse().compose(resolve()).compose(queryIPRecords())` chain.
 
 Full diagrams (C4 + sequence): `docs/architecture.md`.
 
@@ -71,7 +71,7 @@ Full diagrams (C4 + sequence): `docs/architecture.md`.
 | A new DNS-SD primitive (Java-level) | `dnssd/.../DNSSD.java` + both implementations | See `docs/modules/dnssd.md` |
 | A new Rx operator/query (RxJava2) | `rx2dnssd/.../Rx2Dnssd.java` + `Rx2DnssdBindable`/`Rx2DnssdEmbedded` | Then port to `rxdnssd` — see `docs/modules/rx2dnssd.md` |
 | A unit test | `<module>/src/test/java/.../<Module>Test.java` | Mockito + PowerMock, see `docs/runbooks/testing.md` |
-| A sample UI flow | `app/src/main/java/.../DNSSDActivity.java` | Extend existing activity unless a new flow is genuinely separate |
+| A sample UI flow | `app/src/main/java/.../MainActivity.java` | Extend existing activity unless a new flow is genuinely separate |
 | A native/JNI change | `dnssd/src/main/jni/JNISupport.c` + `DNSSD.java.h` | Never touch `mdnsresponder/` except for deliberate upstream sync |
 
 ## Gotchas

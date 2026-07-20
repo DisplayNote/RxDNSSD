@@ -22,7 +22,7 @@ See [AGENTS.md](AGENTS.md) (or [CLAUDE.md](CLAUDE.md) for Claude Code) for the m
 
 ## Hierarchy
 
-There are two version of mDNSReposder. 
+There are two versions of mDNSResponder. 
 
 Bindable version:
 

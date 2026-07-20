@@ -7,8 +7,8 @@ Demo Android app (`com.github.druk.rxdnssd`, `applicationId`) showing how to use
 ## Public API
 
 None — it's an application, not a library. Key classes:
-- `MainActivity` — entry point / permission handling.
-- `DNSSDActivity` — the actual browse/resolve/register/register-service demo, canonical reference for chaining `browse().compose(resolve()).compose(queryRecords())`.
+- `MainActivity` — entry point / permission handling, canonical reference for chaining `browse().compose(resolve()).compose(queryIPRecords())`.
+- `DNSSDActivity` — browse/resolve/register/register-service demo using the lower-level, listener-based `dnssd` API directly.
 - `ServiceAdapter` — RecyclerView/ListView adapter for discovered `BonjourService` items.
 
 ## Upstream / downstream
@@ -22,4 +22,4 @@ No dedicated test suite; this module isn't included in the CircleCI `check` repo
 
 ## Extension points / typical changes
 
-When adding a sample for a new `rx2dnssd` capability, extend `DNSSDActivity` rather than creating a new Activity, unless the feature needs a genuinely separate UI flow.
+When adding a sample for a new `rx2dnssd` capability, extend `MainActivity` rather than creating a new Activity, unless the feature needs a genuinely separate UI flow.

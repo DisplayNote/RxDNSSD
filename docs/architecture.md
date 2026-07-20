@@ -77,7 +77,7 @@ sequenceDiagram
     DNSSDEmbedded->>InternalDNSSD: native resolve()
     InternalDNSSD->>Native: DNSServiceResolve()
     Native-->>App: BonjourService (host, port)
-    App->>Rx2Dnssd: .compose(queryRecords())
+    App->>Rx2Dnssd: .compose(queryIPRecords())
     Rx2Dnssd->>DNSSDEmbedded: mDNSSD.queryRecord()
     DNSSDEmbedded->>InternalDNSSD: native queryRecord()
     InternalDNSSD->>Native: DNSServiceQueryRecord() (A/AAAA + TXT)
