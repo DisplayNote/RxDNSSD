@@ -16,7 +16,7 @@ Claude Code-specific guide. Full detail in `AGENTS.md` — read that first for a
 - DON'T add a dependency between `rxdnssd` and `rx2dnssd`, or have `app` depend on anything but `rx2dnssd`.
 - DON'T call `Internal*` classes (`InternalDNSSD`, etc.) from outside `dnssd` — they're native-method plumbing, not public API.
 - DON'T assume Maven Central coordinates (`com.github.andriydruk`) and this fork's Artifactory coordinates (`com.displaynote.dnssd`) share version history.
-- DON'T trust a green build alone if you touched `dnssd`'s native layer — the JVM test runner stubs native calls (`unitTests.returnDefaultValues = true`); native behavior needs a real device/emulator run (`docs/runbooks/testing.md`).
+- DON'T trust a green build alone if you touched `dnssd`'s native layer — unit tests mock/suppress native calls via PowerMock (`InternalDNSSD` is never actually invoked); native behavior needs a real device/emulator run (`docs/runbooks/testing.md`).
 
 ## Gotcha you will hit first
 

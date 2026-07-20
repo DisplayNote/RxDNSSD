@@ -12,7 +12,7 @@ Unit tests only, organized per module (`dnssd`, `rxdnssd`, `rx2dnssd`) — no in
 
 Stack: JUnit 4 + Mockito 3.6.0 + PowerMock 2.0.9 (`powermock-api-mockito2`, `powermock-module-junit4`). PowerMock is required because tests need to mock static/final/native calls into the `dnssd` native layer — do not upgrade Mockito/PowerMock independently of checking PowerMock's supported-Mockito-version table (linked as a comment in each `build.gradle`).
 
-`unitTests.returnDefaultValues = true` is set in every library module's `build.gradle` — native `InternalDNSSD` methods return their Java default (0/null/false) under the JVM test runner rather than throwing `UnsatisfiedLinkError`.
+`unitTests.returnDefaultValues = true` is set in every library module's `build.gradle` — it only stubs unmocked Android SDK calls under the JVM test runner. `InternalDNSSD`'s native methods are handled separately: PowerMock mocks/suppresses them (`@PrepareForTest`/`mockStatic`) so tests never hit the real JNI layer.
 
 ## Running tests
 

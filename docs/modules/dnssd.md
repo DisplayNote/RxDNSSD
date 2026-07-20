@@ -11,7 +11,7 @@ What doesn't belong here: anything RxJava-specific, anything Android-app-specifi
 
 - `DNSSD` (`dnssd/src/main/java/.../dnssd/DNSSD.java`) — abstract class with `register`, `browse`, `resolve`, `queryRecord`, `createRecordRegistrar`.
 - `DNSSDBindable` — implementation bound to the system `mdnsd`/`nsd` service (requires a `Context`). Deprecated on API 31+ by the OS itself (see `README.md`).
-- `DNSSDEmbedded` — implementation using the bundled native core, no `Context` required, works API 14+.
+- `DNSSDEmbedded` — implementation using the bundled native core (still requires a `Context`, passed to the `DNSSD` constructor), works API 14+.
 - Listener interfaces: `BrowseListener`, `RegisterListener`, `ResolveListener`, `QueryListener`, `DomainListener`, `RegisterRecordListener`.
 - `TXTRecord`, `DNSSDException`, `NSClass`, `NSType` — supporting value types.
 - `DNSSDRecordRegistrar` / `DNSSDRegistration` / `DNSSDService` — handles for in-flight operations.
@@ -36,7 +36,7 @@ Everything under `Internal*` (`InternalDNSSD`, `InternalBrowseListener`, etc.) i
 ./gradlew :dnssd:test
 ```
 
-Tests live in `dnssd/src/test/java/.../dnssd/` (`DnssdTest`, `DNSSDEmbeddedTest`, `MulticastLockTest`) and use JUnit4 + Mockito + PowerMock (needed to mock static/native calls — see `powermock-api-mockito2` in `dnssd/build.gradle`). `unitTests.returnDefaultValues = true` is set because native methods can't run on the JVM test runner.
+Tests live in `dnssd/src/test/java/.../dnssd/` (`DnssdTest`, `DNSSDEmbeddedTest`, `MulticastLockTest`) and use JUnit4 + Mockito + PowerMock (needed to mock static/native calls into `InternalDNSSD` via `@PrepareForTest`/`mockStatic` — see `powermock-api-mockito2` in `dnssd/build.gradle`, since native methods can't run on the JVM test runner). `unitTests.returnDefaultValues = true` is a separate setting that only stubs unmocked Android SDK calls.
 
 ## Extension points / typical changes
 
