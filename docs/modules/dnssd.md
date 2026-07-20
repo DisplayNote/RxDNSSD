@@ -36,7 +36,7 @@ Everything under `Internal*` (`InternalDNSSD`, `InternalBrowseListener`, etc.) i
 ./gradlew :dnssd:test
 ```
 
-Tests live in `dnssd/src/test/java/.../dnssd/` (`DnssdTest`, `DNSSDEmbeddedTest`, `MulticastLockTest`) and use JUnit4 + Mockito + PowerMock (needed to mock static/native calls into `InternalDNSSD` via `@PrepareForTest`/`mockStatic` — see `powermock-api-mockito2` in `dnssd/build.gradle`, since native methods can't run on the JVM test runner). `unitTests.returnDefaultValues = true` is a separate setting that only stubs unmocked Android SDK calls.
+Tests live in `dnssd/src/test/java/.../dnssd/` (`DnssdTest`, `DNSSDEmbeddedTest` — currently `@Ignore`d, so it doesn't run in `:dnssd:test`/`check` — and `MulticastLockTest`) and use JUnit4 + Mockito + PowerMock (needed to mock static/native calls into `InternalDNSSD` via `@PrepareForTest`/`mockStatic` — see `powermock-api-mockito2` in `dnssd/build.gradle`, since native methods can't run on the JVM test runner). `unitTests.returnDefaultValues = true` is a separate setting that only stubs unmocked Android SDK calls.
 
 ## Extension points / typical changes
 

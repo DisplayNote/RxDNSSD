@@ -6,7 +6,7 @@ Unit tests only, organized per module (`dnssd`, `rxdnssd`, `rx2dnssd`) — no in
 
 | Module | Test file(s) |
 |---|---|
-| `dnssd` | `DnssdTest.java`, `DNSSDEmbeddedTest.java`, `MulticastLockTest.java` |
+| `dnssd` | `DnssdTest.java`, `DNSSDEmbeddedTest.java` (`@Ignore`d, does not run in `./gradlew test`/`check`), `MulticastLockTest.java` |
 | `rxdnssd` | `RxDnssdTest.java` |
 | `rx2dnssd` | `Rx2DnssdTest.java` |
 
