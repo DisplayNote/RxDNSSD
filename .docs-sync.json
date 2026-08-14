@@ -1,0 +1,14 @@
+{
+  "_comment": "Per-repo manifest for roadmap 2.30. The docs-sync agent maintains the `modules` list; docs_freshness.py reads it to compute coverage + freshness. Each module maps one doc file under docs/modules/ to the Gradle module source tree it documents.",
+  "docs_root": "docs",
+  "coverage_target": 0.80,
+  "freshness_max_lag_days": 30,
+  "min_doc_bytes": 400,
+  "ignore_code_globs": ["**/*.md", "**/*.gradle", "**/gradle.properties", "**/proguard-rules.*"],
+  "modules": [
+    { "name": "dnssd",     "doc": "docs/modules/dnssd.md",     "code_paths": ["dnssd/src"] },
+    { "name": "rx2dnssd",  "doc": "docs/modules/rx2dnssd.md",  "code_paths": ["rx2dnssd/src"] },
+    { "name": "rxdnssd",   "doc": "docs/modules/rxdnssd.md",   "code_paths": ["rxdnssd/src"] },
+    { "name": "app",       "doc": "docs/modules/app.md",       "code_paths": ["app/src"] }
+  ]
+}
