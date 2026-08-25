@@ -1,0 +1,1 @@
+Fixed in 743c6fd. Replaced the brace-list with a single concrete coordinate (rx2dnssd) and a note that dnssd/rxdnssd are the alternative artifacts, so the snippet is copy-pasteable.

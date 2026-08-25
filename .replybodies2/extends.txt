@@ -1,0 +1,1 @@
+Fixed in 415c582. The relationship labels now say `extends` instead of `implements`, matching that `DNSSDBindable`/`DNSSDEmbedded` subclass the `DNSSD` abstract class.

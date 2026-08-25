@@ -1,0 +1,1 @@
+Fixed in b805f64. Reworded to the durable point (no workflow under `.github/workflows/`) and acknowledged `copilot-instructions.md`.

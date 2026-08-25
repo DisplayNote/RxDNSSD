@@ -1,0 +1,1 @@
+Fixed in 1c1f6c8. Confirmed against Android.mk (MDNS_UDS_SERVERPATH=/dev/socket/mdnsd) and DNSSDBindable's `super(context, "jdns_sd")` — updated the wording to describe the actual Unix-domain-socket IPC via the `jdns_sd` native lib instead of AIDL/bound service.

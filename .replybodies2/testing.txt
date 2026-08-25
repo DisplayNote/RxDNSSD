@@ -1,0 +1,1 @@
+Fixed in cb977e0. Reworded to match the table below (dnssd has three test classes, rxdnssd/rx2dnssd have one each).

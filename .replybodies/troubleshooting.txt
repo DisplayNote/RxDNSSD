@@ -1,0 +1,1 @@
+Fixed in 28f5fe2. Example now uses a slash-separated path so it satisfies gradlew's `"$JAVA_HOME/bin/java"` check under Git Bash.
