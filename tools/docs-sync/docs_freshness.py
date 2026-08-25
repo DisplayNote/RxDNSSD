@@ -95,7 +95,10 @@ def doc_is_present(doc_path, repo_root, min_bytes):
 
 
 def code_exists(code_paths, repo_root):
-    return any(os.path.exists(os.path.join(repo_root, p)) for p in code_paths)
+    # `all`, not `any`: with `any`, a module that declares five code paths and
+    # still has one of them keeps reporting clean while the other four have been
+    # deleted or moved — exactly the manifest drift this check exists to catch.
+    return all(os.path.exists(os.path.join(repo_root, p)) for p in code_paths)
 
 
 def human_date(epoch):
