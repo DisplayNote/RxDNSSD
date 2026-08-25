@@ -135,9 +135,12 @@ pack is identical — the engine is the only thing that changes.
   mean it cannot land production-code changes.
 - **Always reviewed.** Commits land on a `chore/docs-*` branch behind a PR;
   nothing reaches a protected branch unreviewed.
-- **Attribution.** Commit identity is the generic `docs-sync` bot; nothing
-  mentions AI / co-authorship. Add the `ai-influenced` label via branch policy
-  or a CODEOWNERS automation if you want these counted in 2.3.
+- **Attribution.** Commit identity is the generic `docs-sync` bot and no commit
+  or file carries an authorship marker (`Co-authored-by:`, "Generated with",
+  tool badges). This bans *attribution*, not the subject: repos that document
+  their AI-agent workflow (`AGENTS.md`, `CLAUDE.md`, `docs/ai/**`) keep doing so.
+  Add the `ai-influenced` label via branch policy or a CODEOWNERS automation if
+  you want these counted in 2.3.
 
 ## Measuring the 2.30 gate
 

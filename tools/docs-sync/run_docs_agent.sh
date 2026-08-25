@@ -59,7 +59,7 @@ fi
   echo "## Non-negotiable output rules"
   echo "- Edit documentation only (AGENTS.md, CLAUDE.md, Docs/**, doc/**, docs/**, .docs-sync.json). Never touch production code."
   echo "- Keep .docs-sync.json in sync: add modules you newly document, drop tombstoned ones."
-  echo "- Do NOT mention AI, Copilot, Claude, or co-authorship anywhere in files, commits, or output."
+  echo "- Do NOT add authorship/attribution markers (Co-authored-by:, 'Generated with', 'Assisted by', tool badges) to any file, commit, or output. Documenting the repo's own AI-agent workflow (AGENTS.md, CLAUDE.md, docs/ai/**) is expected and must stay accurate — this rule is about attribution only."
   echo "- End your reply with a section '### Docs summary' (<=6 bullet lines) describing what you changed; list any TODO(human) items."
 } > docs-agent-prompt.txt
 

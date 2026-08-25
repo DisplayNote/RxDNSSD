@@ -95,7 +95,12 @@ one-paragraph "what changed and why" suitable for the PR description.
 - Prefer in-place updates over parallel files. Code blocks declare their
   language and are copy-pasteable. Direct tone, no marketing, no emojis unless
   the repo already uses them.
-- Do not mention AI, Copilot, Claude, or co-authorship in any file, commit, or summary.
+- Do not add authorship or attribution markers — no `Co-authored-by:` /
+  `Generated with` / `Assisted by` trailers, no "written by <assistant>" notes,
+  no tool badges — in any file, commit message, or summary. This is about
+  attribution only: this repo documents its AI-agent workflow (`AGENTS.md`,
+  `CLAUDE.md`, `docs/ai/**`), and that subject matter must be documented
+  accurately, naming the tools where the docs already do.
 - Do not run `git add`, `git commit`, `git push`, or change the git identity, and
   do not open PRs. Make your edits in the working tree and stop — the workflow
   stages, commits, pushes, and opens the PR. (Read-only git such as `git diff` /
