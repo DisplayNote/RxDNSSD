@@ -69,6 +69,11 @@ PROMPT="$(cat docs-agent-prompt.txt)"
 # working-tree guard alone is bypassable: a `git commit`/`git reset --hard` by
 # the agent leaves a clean tree relative to the new HEAD, hiding its edits.
 HEAD_BEFORE="$(git rev-parse HEAD 2>/dev/null || true)"
+# Same idea for the push target: the agent is allowed `shell(git:*)`, so a
+# `git remote set-url origin ...` would survive both the HEAD and the
+# working-tree guard and silently redirect the push that open_catchup_pr.sh
+# later performs with the built-in token.
+ORIGIN_BEFORE="$(git remote get-url origin 2>/dev/null || true)"
 
 case "$ENGINE" in
   copilot)
@@ -125,6 +130,13 @@ esac
 HEAD_AFTER="$(git rev-parse HEAD 2>/dev/null || true)"
 if [ "$HEAD_AFTER" != "$HEAD_BEFORE" ]; then
   echo "ERROR: agent moved HEAD ($HEAD_BEFORE -> $HEAD_AFTER); refusing to continue." >&2
+  exit 1
+fi
+
+# The agent must not have repointed the push target either.
+ORIGIN_AFTER="$(git remote get-url origin 2>/dev/null || true)"
+if [ "$ORIGIN_AFTER" != "$ORIGIN_BEFORE" ]; then
+  echo "ERROR: agent changed the origin remote ($ORIGIN_BEFORE -> $ORIGIN_AFTER); refusing to continue." >&2
   exit 1
 fi
 
