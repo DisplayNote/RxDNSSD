@@ -154,8 +154,14 @@ jobs:
           # (paid) agent run entirely instead of stacking a second PR on top of it.
           # Nothing is lost: the anchor above doesn't advance until a docs PR merges,
           # so the next run re-proposes the whole undocumented delta.
-          OPEN="$(gh pr list --state open --json headRefName \
-            --jq '[.[] | select(.headRefName | startswith("chore/docs-"))] | length' 2>/dev/null || echo 0)"
+          # Fail CLOSED: `|| echo 0` on the query would turn an API error or auth
+          # failure into "no docs PR is open" and let the run stack a second PR.
+          if ! OPEN="$(gh pr list --state open --json headRefName \
+            --jq '[.[] | select(.headRefName | startswith("chore/docs-"))] | length')"; then
+            echo "clear=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=docs-sync skipped::Could not list open PRs; skipping tonight's run rather than risk opening a duplicate docs PR."
+            exit 0
+          fi
           if [ "${OPEN:-0}" != "0" ]; then
             echo "clear=false" >> "$GITHUB_OUTPUT"
             echo "::notice title=docs-sync skipped::A documentation PR is already open; skipping tonight's run until it is merged or closed."
