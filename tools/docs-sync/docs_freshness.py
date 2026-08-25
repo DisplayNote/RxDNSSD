@@ -172,7 +172,10 @@ def main():
         code_epoch = last_commit_epoch(code_paths, repo_root, ignore_globs)
         doc_epoch = last_commit_epoch([doc_path], repo_root, ignore_globs)
         lag = code_epoch - doc_epoch  # >0 => code newer than doc
-        is_stale = has_doc and code_epoch and lag > max_lag_secs
+        # bool(): the `and` chain short-circuits to the int 0 when a documented
+        # module has no code commits, which would put `0` (not `false`) in the
+        # JSON report and break consumers that type-check the field.
+        is_stale = bool(has_doc and code_epoch and lag > max_lag_secs)
 
         if is_stale:
             stale.append(name)
