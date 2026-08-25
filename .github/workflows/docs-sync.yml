@@ -177,6 +177,12 @@ jobs:
       # must never go red on a schedule. Surface a notice so the gap is visible.
       - name: Check Copilot auth
         id: auth
+        # Gated like the agent/PR steps: on a quiet night, or while a docs PR is
+        # open, no agent will run anyway, so emitting a "missing COPILOT_PAT"
+        # notice here would just be misleading noise.
+        if: >-
+          steps.scope.outputs.have_scope == 'true' &&
+          steps.openpr.outputs.clear == 'true'
         env:
           COPILOT_PAT: ${{ secrets.COPILOT_PAT }}
         run: |
@@ -188,6 +194,7 @@ jobs:
           fi
 
       - name: Run docs-maintenance agent
+        id: agent
         if: >-
           steps.scope.outputs.have_scope == 'true' &&
           steps.openpr.outputs.clear == 'true' &&
@@ -206,10 +213,14 @@ jobs:
         run: bash tools/docs-sync/run_docs_agent.sh
 
       - name: Open documentation PR
+        # Also requires the agent step to have SUCCEEDED. It is continue-on-error,
+        # so without this a crashed/rate-limited agent run would still reach this
+        # step and could open a PR from whatever it left half-staged.
         if: >-
           steps.scope.outputs.have_scope == 'true' &&
           steps.openpr.outputs.clear == 'true' &&
-          steps.auth.outputs.ready == 'true'
+          steps.auth.outputs.ready == 'true' &&
+          steps.agent.outcome == 'success'
         # Non-fatal: transient PR create/label errors (rate limit, API flake)
         # shouldn't turn the nightly schedule red.
         continue-on-error: true

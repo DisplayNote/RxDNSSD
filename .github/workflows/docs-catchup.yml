@@ -86,6 +86,7 @@ jobs:
           fi
 
       - name: Full drift sweep
+        id: agent
         if: steps.auth.outputs.ready == 'true'
         # Non-fatal: a transient agent error must not make the weekly scheduled
         # run fail noisily. The failure stays visible on the step; the PR-open
@@ -99,7 +100,11 @@ jobs:
         run: bash tools/docs-sync/run_docs_agent.sh
 
       - name: Open catch-up PR
-        if: steps.auth.outputs.ready == 'true'
+        # Also requires the sweep to have SUCCEEDED — it is continue-on-error, so
+        # otherwise a failed agent run would still reach the PR step.
+        if: >-
+          steps.auth.outputs.ready == 'true' &&
+          steps.agent.outcome == 'success'
         # Non-fatal: transient PR create/edit errors (rate limit, permissions,
         # API flake) shouldn't turn the weekly schedule red.
         continue-on-error: true
