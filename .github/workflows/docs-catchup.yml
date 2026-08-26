@@ -70,11 +70,37 @@ jobs:
       - name: Coverage + freshness (before)
         run: python tools/docs-sync/docs_freshness.py --manifest .docs-sync.json --json-out docs-freshness.json --mode report || true
 
+      - name: Check for an open documentation PR
+        id: openpr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          # open_catchup_pr.sh's own duplicate-PR guard would no-op this run
+          # anyway once a chore/docs-* PR is open; check it first so the
+          # (paid) agent step isn't spent producing a sweep that gets thrown
+          # away. Fail CLOSED: an API/auth error must not read as "clear".
+          if ! OPEN="$(gh pr list --state open --json headRefName \
+            --jq '[.[] | select(.headRefName | startswith("chore/docs-"))] | length')"; then
+            echo "clear=false" >> "$GITHUB_OUTPUT"
+            echo "::warning title=docs-catchup skipped::Could not list open PRs; skipping this run rather than risk a wasted sweep."
+            exit 0
+          fi
+          if [ "${OPEN:-0}" != "0" ]; then
+            echo "clear=false" >> "$GITHUB_OUTPUT"
+            echo "::notice title=docs-catchup skipped::A documentation PR is already open; skipping this run until it is merged or closed."
+          else
+            echo "clear=true" >> "$GITHUB_OUTPUT"
+          fi
+
       # The Copilot engine needs a user PAT (the built-in token is rejected). If
       # it isn't configured, skip the sweep rather than failing — this workflow
       # must never block anything. Surface a notice so the gap is visible.
       - name: Check Copilot auth
         id: auth
+        # Gated like the agent/PR steps: while a docs PR is open no agent will
+        # run anyway, so a "missing COPILOT_PAT" notice here would just be noise.
+        if: steps.openpr.outputs.clear == 'true'
         env:
           COPILOT_PAT: ${{ secrets.COPILOT_PAT }}
         run: |
@@ -87,7 +113,9 @@ jobs:
 
       - name: Full drift sweep
         id: agent
-        if: steps.auth.outputs.ready == 'true'
+        if: >-
+          steps.openpr.outputs.clear == 'true' &&
+          steps.auth.outputs.ready == 'true'
         # Non-fatal: a transient agent error must not make the weekly scheduled
         # run fail noisily. The failure stays visible on the step; the PR-open
         # step below is a no-op when nothing was staged.
@@ -103,6 +131,7 @@ jobs:
         # Also requires the sweep to have SUCCEEDED — it is continue-on-error, so
         # otherwise a failed agent run would still reach the PR step.
         if: >-
+          steps.openpr.outputs.clear == 'true' &&
           steps.auth.outputs.ready == 'true' &&
           steps.agent.outcome == 'success'
         # Non-fatal: transient PR create/edit errors (rate limit, permissions,
