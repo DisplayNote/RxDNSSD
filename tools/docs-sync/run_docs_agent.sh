@@ -1,0 +1,176 @@
+#!/usr/bin/env bash
+# run_docs_agent.sh — run the headless docs-maintenance agent over the scope,
+# edit documentation only, and stage the result. Roadmap 2.30.
+#
+# Engine is pluggable (ENGINE env): "copilot" (default) or "claude".
+#   copilot : GitHub Copilot CLI in programmatic mode (`copilot -p`). Billed to
+#             your existing Copilot seats — no separate model key. Auth via
+#             COPILOT_GITHUB_TOKEN (a fine-grained PAT with Copilot access).
+#   claude  : Claude Code headless (`claude -p`). Auth via ANTHROPIC_API_KEY.
+#
+# Inputs (env):
+#   ENGINE              - copilot | claude   (default copilot)
+#   MAINTENANCE_PROMPT  - default docs/ai/prompts/docs-maintenance.md
+#   SCOPE_FILE          - default docs-scope.txt (one path per line;
+#                         empty/absent => full drift sweep / catch-up)
+#   MODEL               - optional model override (engine-specific)
+#   MAX_TURNS           - claude only; default 60 (agent-loop / cost guardrail)
+#   COPILOT_GITHUB_TOKEN- copilot engine auth
+#   ANTHROPIC_API_KEY   - claude engine auth
+#
+# Output (consumed by the PR/branch step which commits/pushes/comments):
+#   - stages only doc files (AGENTS.md CLAUDE.md doc docs Docs .docs-sync.json)
+#   - writes docs-agent.log (full agent transcript)
+# Host-agnostic: works under GitHub Actions or a plain shell.
+set -euo pipefail
+
+ENGINE="${ENGINE:-copilot}"
+MAINTENANCE_PROMPT="${MAINTENANCE_PROMPT:-docs/ai/prompts/docs-maintenance.md}"
+# Use plain `-` (not `:-`) so an explicitly empty SCOPE_FILE means "full drift
+# sweep" (the documented contract), rather than silently falling back to
+# docs-scope.txt if that file happens to exist locally.
+SCOPE_FILE="${SCOPE_FILE-docs-scope.txt}"
+MAX_TURNS="${MAX_TURNS:-60}"
+
+if [ ! -f "$MAINTENANCE_PROMPT" ]; then
+  echo "ERROR: maintenance prompt not found: $MAINTENANCE_PROMPT" >&2
+  exit 2
+fi
+
+SCOPE=""
+if [ -f "$SCOPE_FILE" ]; then
+  # Single-pass awk (drop blank lines, stop after 400): a `sed | head -400` pipe
+  # would SIGPIPE sed (exit 141) on larger files and abort under `set -o pipefail`.
+  SCOPE="$(awk 'NF { print; if (++n == 400) exit }' "$SCOPE_FILE")"
+fi
+
+# Build the prompt: in-repo maintenance prompt + run-specific scope + hard rules.
+{
+  cat "$MAINTENANCE_PROMPT"
+  echo
+  echo "## Scope for this run"
+  if [ -n "$SCOPE" ]; then
+    echo "Update only the docs invalidated by these changed files:"
+    echo "$SCOPE"
+  else
+    echo "No scope provided: perform a full drift sweep per Phase 0 (catch-up)."
+  fi
+  echo
+  echo "## Non-negotiable output rules"
+  echo "- Edit documentation only (AGENTS.md, CLAUDE.md, Docs/**, doc/**, docs/**, .docs-sync.json). Never touch production code."
+  echo "- Keep .docs-sync.json in sync: add modules you newly document, drop tombstoned ones."
+  echo "- Do NOT add authorship/attribution markers (Co-authored-by:, 'Generated with', 'Assisted by', tool badges) to any file, commit, or output. Documenting the repo's own AI-agent workflow (AGENTS.md, CLAUDE.md, docs/ai/**) is expected and must stay accurate — this rule is about attribution only."
+  echo "- End your reply with a section '### Docs summary' (<=6 bullet lines) describing what you changed; list any TODO(human) items."
+} > docs-agent-prompt.txt
+
+PROMPT="$(cat docs-agent-prompt.txt)"
+
+# Record HEAD so the post-agent guard can prove the agent didn't move it. The
+# working-tree guard alone is bypassable: a `git commit`/`git reset --hard` by
+# the agent leaves a clean tree relative to the new HEAD, hiding its edits.
+HEAD_BEFORE="$(git rev-parse HEAD 2>/dev/null || true)"
+# Same idea for the push target: the agent is allowed `shell(git:*)`, so a
+# `git remote set-url origin ...` would survive both the HEAD and the
+# working-tree guard and silently redirect the push that open_catchup_pr.sh
+# later performs with the built-in token.
+ORIGIN_BEFORE="$(git remote get-url origin 2>/dev/null || true)"
+
+case "$ENGINE" in
+  copilot)
+    # Auth: the Copilot CLI needs a USER token with Copilot access. The Actions
+    # built-in GITHUB_TOKEN is a GitHub App (server-to-server) token and is
+    # rejected by the Copilot model endpoint, so pass a PAT as COPILOT_GITHUB_TOKEN.
+    # (Do NOT fall back to GH_TOKEN/GITHUB_TOKEN here — that would pick up the
+    # Actions App token and fail with "server-to-server tokens are not supported".)
+    if [ -z "${COPILOT_GITHUB_TOKEN:-}" ]; then
+      echo "ERROR: COPILOT_GITHUB_TOKEN is not set. The Copilot CLI needs a USER" >&2
+      echo "       token with Copilot access (fine-grained PAT, 'Copilot Requests'" >&2
+      echo "       permission, from an account with a Copilot seat). The Actions" >&2
+      echo "       built-in GITHUB_TOKEN does NOT work for Copilot inference." >&2
+      exit 2
+    fi
+    command -v copilot >/dev/null || { echo "ERROR: copilot CLI not installed (npm i -g @github/copilot)" >&2; exit 2; }
+    # --allow-tool auto-approves the agent's file writes and git shell commands
+    # (reads need no approval); --no-ask-user makes it non-interactive. No
+    # interpreter is allow-listed on purpose: COPILOT_GITHUB_TOKEN lives in this
+    # environment and the transcript is logged, so an auto-approved python/bash
+    # would be an arbitrary-execution path next to a credential. Nothing in the
+    # docs-maintenance prompt needs one. Docs-only is enforced again at staging.
+    MODEL_ARG=(); [ -n "${MODEL:-}" ] && MODEL_ARG=(--model "$MODEL")
+    copilot -p "$PROMPT" \
+      "${MODEL_ARG[@]}" \
+      --allow-tool='write' \
+      --allow-tool='shell(git:*)' \
+      --no-ask-user \
+      2>&1 | tee docs-agent.log
+    ;;
+  claude)
+    if [ -z "${ANTHROPIC_API_KEY:-}" ]; then
+      echo "ERROR: ANTHROPIC_API_KEY is not set (Claude engine auth)" >&2
+      exit 2
+    fi
+    command -v claude >/dev/null || { echo "ERROR: claude CLI not installed (npm i -g @anthropic-ai/claude-code)" >&2; exit 2; }
+    export DISABLE_AUTOUPDATER=1
+    claude -p "$PROMPT" \
+      --model "${MODEL:-claude-sonnet-4-6}" \
+      --max-turns "$MAX_TURNS" \
+      --permission-mode acceptEdits \
+      --allowedTools "Read,Edit,Write,Glob,Grep,Bash(git*)" \
+      2>&1 | tee docs-agent.log
+    ;;
+  *)
+    echo "ERROR: unknown ENGINE '$ENGINE' (expected copilot|claude)" >&2
+    exit 2
+    ;;
+esac
+
+# The agent must not move HEAD. If it committed/reset, the working-tree guard
+# below would see a clean tree and miss the change (and later steps would run
+# whatever the agent left behind), so fail hard here.
+HEAD_AFTER="$(git rev-parse HEAD 2>/dev/null || true)"
+if [ "$HEAD_AFTER" != "$HEAD_BEFORE" ]; then
+  echo "ERROR: agent moved HEAD ($HEAD_BEFORE -> $HEAD_AFTER); refusing to continue." >&2
+  exit 1
+fi
+
+# The agent must not have repointed the push target either.
+ORIGIN_AFTER="$(git remote get-url origin 2>/dev/null || true)"
+if [ "$ORIGIN_AFTER" != "$ORIGIN_BEFORE" ]; then
+  echo "ERROR: agent changed the origin remote ($ORIGIN_BEFORE -> $ORIGIN_AFTER); refusing to continue." >&2
+  exit 1
+fi
+
+# Guard: the agent must touch documentation surfaces only. Inspect the WHOLE
+# working tree (not just what we stage), so a stray or injected edit — e.g. to
+# the tools/docs-sync/*.sh scripts that later CI steps execute — can't slip
+# through. The run's own generated artifacts are allowed. Derive touched paths
+# from porcelain-free plumbing (name-only diff + untracked listing) so renames
+# and paths with spaces don't trip a false positive. Nothing is staged yet, so
+# `git diff --name-only` already covers the agent's edits.
+STRAY="$( { git diff --name-only; git ls-files --others --exclude-standard; } \
+  | sort -u \
+  | grep -Ev '^(AGENTS\.md|CLAUDE\.md|\.docs-sync\.json|docs-agent-prompt\.txt|docs-agent\.log|docs-scope\.txt|docs-freshness\.json|(Docs|doc|docs)/.*)$' || true)"
+if [ -n "$STRAY" ]; then
+  echo "ERROR: agent modified files outside the documentation surfaces; aborting before any later step can run them:" >&2
+  printf '  %s\n' "$STRAY" >&2
+  exit 1
+fi
+
+# Stage only documentation surfaces (defense in depth against stray edits).
+# Only pass paths that exist: `git add` aborts the whole command on a pathspec
+# that matches nothing (e.g. `doc` in a repo whose docs root is `Docs`), which
+# would silently stage nothing.
+DOC_PATHS=()
+for p in AGENTS.md CLAUDE.md doc docs Docs .docs-sync.json; do
+  [ -e "$p" ] && DOC_PATHS+=("$p")
+done
+if [ ${#DOC_PATHS[@]} -gt 0 ]; then
+  git add -A "${DOC_PATHS[@]}"
+fi
+
+if git diff --cached --quiet; then
+  echo "No documentation changes produced."
+else
+  echo "Documentation changes staged:"
+  git diff --cached --stat
+fi
