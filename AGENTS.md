@@ -14,7 +14,7 @@ RxDNSSD is an Android library set implementing a DNS-SD/mDNS (Bonjour/Zeroconf) 
 ├── rx2dnssd/     RxJava 2 wrapper over dnssd. Use this for new integrations.
 ├── docs/         architecture.md, per-module docs, runbooks, glossary (this doc set).
 ├── BUILD.md      Local-build and publish toggle instructions.
-└── circle.yml    CircleCI config (only CI in this repo; no GitHub Actions workflow).
+└── circle.yml    CircleCI config (build/test CI; see .github/workflows/ for docs-sync automation).
 ```
 
 Full per-module detail: `docs/modules/dnssd.md`, `docs/modules/rxdnssd.md`, `docs/modules/rx2dnssd.md`, `docs/modules/app.md`.
@@ -81,7 +81,7 @@ Full diagrams (C4 + sequence): `docs/architecture.md`.
 - **Two coordinate spaces**: historical Maven Central releases used `com.github.andriydruk`; this fork publishes as `com.displaynote.dnssd` (`publish-root.gradle`). Don't assume version numbers or artifact history are shared between the two.
 - **`DNSSDBindable`/`Rx*DnssdBindable` deprecated by the OS** on `targetSDK 31`+ (Android 12) — new integrations should default to the Embedded variants.
 - **Windows `JAVA_HOME` quoting bug**: see `docs/runbooks/troubleshooting.md` — a quoted env var value can make Gradle report a valid JDK directory as invalid.
-- **No GitHub Actions**: CI is CircleCI only (`circle.yml`); there's no workflow under `.github/workflows/` (`.github/` holds an issue template and `copilot-instructions.md`).
+- **Build/test CI stays CircleCI-only**: `circle.yml` is the only CI for building and testing code. `.github/workflows/` holds the docs-sync automation (roadmap 2.30) — nightly/on-demand documentation upkeep, not build or test CI.
 
 ## Glossary
 
@@ -93,4 +93,5 @@ See `docs/glossary.md` (DNS-SD, mDNS, mDNSResponder, Bindable vs Embedded, Bonjo
 |---|---|---|
 | Artifactory (DisplayNote) | Maven publish target for `dnssd`/`rxdnssd`/`rx2dnssd` | `publish-root.gradle`, `publish-module.gradle`, credentials via `gradle.properties` or env vars |
 | CircleCI | CI: `androidDependencies` + `check`, uploads test reports | `circle.yml` |
+| GitHub Actions | Docs-sync automation only (roadmap 2.30) — nightly/on-demand documentation upkeep, not build/test CI | `.github/workflows/`, see `tools/docs-sync/README.md` |
 | Android system `mdnsd`/`nsd` daemon | Backing service for `*Bindable` implementations (deprecated API 31+) | No repo config — OS-provided, bound via `Context` at runtime |
