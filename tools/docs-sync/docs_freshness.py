@@ -121,7 +121,7 @@ def main():
     manifest_path = os.path.join(repo_root, args.manifest)
     if not os.path.isfile(manifest_path):
         print(f"ERROR: manifest not found: {manifest_path}", file=sys.stderr)
-        print("Run docs-init/docs-update to generate it, or add it by hand.", file=sys.stderr)
+        print("Add a .docs-sync.json manifest by hand — see tools/docs-sync/README.md.", file=sys.stderr)
         sys.exit(2)
 
     with open(manifest_path, encoding="utf-8") as fh:

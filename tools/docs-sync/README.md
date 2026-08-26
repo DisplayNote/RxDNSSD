@@ -194,7 +194,8 @@ git reset --hard                         # discard if only testing
   to a 26h window and skips whatever came before that.
 - The nightly documents `master` only. Code on a long-lived feature branch is
   documented once it merges, not before.
-- Repos not yet through 1.19: run the `docs-init` skill once to bootstrap, then
-  add these workflows. `docs_freshness.py` refuses to run without a manifest.
+- Repos not yet through 1.19: create the baseline module docs and a hand-written
+  `.docs-sync.json` manifest first, then add these workflows. `docs_freshness.py`
+  refuses to run without a manifest.
 - *Silent drift* a scoped diff can't see is handled by `docs-catchup.yml` (the
   weekly full sweep), not by the nightly.
