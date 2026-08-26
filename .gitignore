@@ -52,3 +52,8 @@ docs-freshness.json
 docs-agent.log
 docs-agent-prompt.txt
 docs-scope.txt
+
+# review-loop local scratch (thread caches, reply-body drafts)
+.threads*.json
+.reply_*.txt
+.replybodies*/

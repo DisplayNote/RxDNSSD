@@ -1,1 +1,0 @@
-Fixed in f825a56. Confirmed Gradle 7.0.2's wrapper caps at Java 16 (no JDK 17 support until Gradle 7.3) and AGP 7.0.3 requires JDK 11+, so the docs now say JDK 11-16 and the JAVA_HOME examples use a JDK 11 build instead of 17.

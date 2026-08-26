@@ -1,1 +1,0 @@
-Fixed in 415c582. `DNSSD` is now described as an abstract class (not an interface) throughout this file, matching `dnssd/src/main/java/.../dnssd/DNSSD.java`'s `public abstract class DNSSD`.

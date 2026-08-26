@@ -1,1 +1,0 @@
-Fixed in b805f64. Now points at `.github/workflows/` for the "no GitHub Actions" claim and notes `.github/` also holds `copilot-instructions.md`.

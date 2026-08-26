@@ -1,1 +1,0 @@
-Fixed in 415c582. The resolve()/queryRecords() steps now route through `DNSSDEmbedded`/`InternalDNSSD` like the browse() step does, instead of appearing to call the native library directly — matching `Rx2DnssdCommon`'s `mDNSSD.resolve()`/`mDNSSD.queryRecord()` calls.

@@ -1,1 +1,0 @@
-Fixed in df87eca. Relationship label now uses a Maven coordinate form covering all three modules instead of the in-repo `project(':rx2dnssd')` notation.

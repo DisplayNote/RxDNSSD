@@ -1,1 +1,0 @@
-Fixed in 98eb60e. Replaced with a relative Markdown link so it resolves in GitHub's renderer.

@@ -1,1 +1,0 @@
-Fixed in 98eb60e (link) and 415c582 (DNSSD is an abstract class, not an interface). Also pointed the reference at the actual release runbook since there's no separate "publishing" doc in this PR.
