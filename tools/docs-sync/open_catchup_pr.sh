@@ -30,7 +30,9 @@ MODE="${MODE:-catchup}"
 case "$MODE" in
   catchup)
     BRANCH_PREFIX="chore/docs-catchup-"
-    DUP_PREFIX="chore/docs-catchup-"
+    # Broader than our own prefix on purpose: defer to any open docs PR
+    # (nightly or catch-up) so the two can't propose competing edits.
+    DUP_PREFIX="chore/docs-"
     NO_CHANGES_MSG="Drift sweep produced no documentation changes — nothing to open."
     COMMIT_SUBJECT="docs: reconcile technical documentation with current code"
     COMMIT_BODY="One-time/scheduled drift sweep that brings AGENTS.md / CLAUDE.md / docs back in
