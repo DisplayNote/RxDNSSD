@@ -70,7 +70,10 @@ original); a fact should live in exactly one place — the rest link to it.
 ## Phase 2 — Verification
 
 1. Re-run every command you touched (build, test, lint) and fix the doc if it
-   fails.
+   fails. The docs-sync agent runs with `write` + `shell(git:*)` only (see
+   `run_docs_agent.sh`), so it cannot execute these itself — leave a
+   `> TODO(human):` marker asking a reviewer to verify instead of claiming the
+   commands were run.
 2. Re-check the 5 sampled "Where to add X" entries are now accurate.
 3. Confirm Mermaid diagrams still render and reflect the new layout.
 4. Grep the docs for any path/symbol that no longer exists — no orphans.
