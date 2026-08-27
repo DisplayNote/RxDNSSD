@@ -139,6 +139,7 @@ fi
 ORIGIN_AFTER="$(git remote get-url origin 2>/dev/null || true)"
 if [ "$ORIGIN_AFTER" != "$ORIGIN_BEFORE" ]; then
   echo "ERROR: agent changed the origin remote ($ORIGIN_BEFORE -> $ORIGIN_AFTER); refusing to continue." >&2
+  echo "::error title=docs-sync guard::the docs agent changed the origin remote; refusing to continue (see the step log for the before/after urls)."
   exit 1
 fi
 
