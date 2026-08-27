@@ -155,7 +155,9 @@ STRAY="$( { git diff --name-only; git ls-files --others --exclude-standard; } \
 if [ -n "$STRAY" ]; then
   echo "ERROR: agent modified files outside the documentation surfaces; aborting before any later step can run them:" >&2
   printf '  %s\n' "$STRAY" >&2
-  echo "::error title=docs-sync guard::agent modified files outside the documentation surfaces: $(printf '%s' "$STRAY" | tr '\012' ' ')"
+  MSG="$(printf '%s' "$STRAY")"
+  MSG="${MSG//'%'/'%25'}"; MSG="${MSG//$'\r'/'%0D'}"; MSG="${MSG//$'\n'/'%0A'}"
+  echo "::error title=docs-sync guard::agent modified files outside the documentation surfaces: $MSG"
   exit 1
 fi
 
