@@ -27,6 +27,9 @@ cd RxDNSSD
 ./gradlew clean build
 ```
 
+Run `/secret-scan-setup` once per clone (or `--global` once per machine for new clones) — commits containing secrets are blocked locally and in CI.
+`/secret-scan-setup` is a Claude Code command from DisplayNote's `displaynote-engineering` plugin (install it with `/plugin install displaynote-engineering`); it is not part of this repository.
+
 `BUILD.md` has the full local-vs-publish dependency toggle instructions — read it before your first build, since `rxdnssd/build.gradle` and `rx2dnssd/build.gradle` ship with the **local** `api project(':dnssd')` dependency active by default (correct for local dev, must be switched before publishing).
 
 ## Run the sample app

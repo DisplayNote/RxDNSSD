@@ -2,6 +2,8 @@
 
 Claude Code-specific guide. Full detail in `AGENTS.md` — read that first for architecture, module map, and gotchas.
 
+@AGENTS.md
+
 ## DO
 
 - DO run `./gradlew :dnssd:test`, `:rxdnssd:test`, `:rx2dnssd:test` (as relevant) after touching any of those modules — no CI runs on your behalf until push.
