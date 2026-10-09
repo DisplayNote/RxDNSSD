@@ -4,6 +4,16 @@
 
 RxDNSSD is an Android library set implementing a DNS-SD/mDNS (Bonjour/Zeroconf) client, published as three Maven artifacts from one repo. Stack: Java 8 (Android), Gradle (Android Gradle Plugin 7.0.3), native C (NDK 28.2.13676358, vendored Apple mDNSResponder), RxJava 1 and RxJava 2. **Archived project** — see the Ukraine notice at the top of `README.md`; DisplayNote maintains an internal fork (see `docs/architecture.md` "Active decisions").
 
+## Security
+
+- NEVER suggest hardcoded credentials, API keys, or connection strings
+- NEVER generate code that logs PII or sensitive data
+- Flag any code that introduces new external dependencies
+- Prefer established authentication patterns (OAuth2, JWT) over custom implementations
+- Do not generate SQL without parameterised queries
+- Flag any configuration changes that affect network exposure or access controls
+- NEVER read raw log files or paste log content into a prompt — sanitise with `dn_logscrub` first (`/log-sanitise <file>`) and work only from the `.scrubbed` copy (AI Security Roadmap 4.7)
+
 ## Repository map
 
 ```
