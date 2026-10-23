@@ -7,7 +7,7 @@ Full step-by-step lives in `BUILD.md` ("PUBLISH INSTRUCTIONS") — this runbook 
 Pushing a tag named after the version (e.g. `git tag 0.9.22 && git push origin 0.9.22`) runs
 `ci/azure-pipelines.yml` on the tag: after the tests and the release build, the `gradle_publish`
 stage runs `:dnssd:publish :rxdnssd:publish :rx2dnssd:publish` with `PUBLISH_VERSION` set to the tag
-and the Artifactory URL and credentials from the `artifactoryCredentials` variable group. Branch and
+and the Artifactory credentials (`MAVEN_ARTIFACTORY_USER`/`MAVEN_ARTIFACTORY_PASS`) from the `montage-client-environment-variables` variable group, base URL in the pipeline. Branch and
 PR builds never publish. No local/published toggle is needed: with `api project(':dnssd')` the
 `rxdnssd`/`rx2dnssd` POMs already name `com.displaynote.dnssd:dnssd:<version>`. The manual steps
 below remain for a release from a workstation.

@@ -46,10 +46,13 @@ resources:
       ref: refs/tags/v1.1.2
 
 variables:
-  # DisplayNote Artifactory (publish-root.gradle): the read-only user that
-  # resolves dependencies, the deployer user that publishes to
-  # libs-release-local / libs-snapshot-local, and the base URL.
-  - group: artifactoryCredentials
+  # DisplayNote Artifactory credentials (publish-root.gradle):
+  # MAVEN_ARTIFACTORY_USER / MAVEN_ARTIFACTORY_PASS, the same secrets the
+  # Montage Android pipelines use. Gradle needs them to configure (the root
+  # build.gradle resolves from Artifactory), so every Gradle stage maps them.
+  - group: montage-client-environment-variables
+  - name: artifactoryBaseUrl
+    value: 'https://maven-montage.westus.cloudapp.azure.com/artifactory'
 
 stages:
     # Both scan stages declare dependsOn: [], so they start together.
@@ -80,11 +83,11 @@ stages:
         modules: [':dnssd', ':rxdnssd', ':rx2dnssd']
         jdkVersion: '11'
         env:
-          DEPLOYER_ARTIFACTORY_URL: $(DEPLOYER_ARTIFACTORY_URL)
-          MAVEN_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USERNAME)
-          MAVEN_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASSWORD)
-          DEPLOYER_ARTIFACTORY_USERNAME: $(DEPLOYER_ARTIFACTORY_USERNAME)
-          DEPLOYER_ARTIFACTORY_PASSWORD: $(DEPLOYER_ARTIFACTORY_PASSWORD)
+          DEPLOYER_ARTIFACTORY_URL: $(artifactoryBaseUrl)
+          MAVEN_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USER)
+          MAVEN_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASS)
+          DEPLOYER_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USER)
+          DEPLOYER_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASS)
 
     # dnssd builds the vendored mDNSResponder with ndk-build; the NDK version
     # is the ndkVersion pinned in dnssd/build.gradle.
@@ -95,11 +98,11 @@ stages:
         jdkVersion: '11'
         ndkVersion: '28.2.13676358'
         env:
-          DEPLOYER_ARTIFACTORY_URL: $(DEPLOYER_ARTIFACTORY_URL)
-          MAVEN_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USERNAME)
-          MAVEN_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASSWORD)
-          DEPLOYER_ARTIFACTORY_USERNAME: $(DEPLOYER_ARTIFACTORY_USERNAME)
-          DEPLOYER_ARTIFACTORY_PASSWORD: $(DEPLOYER_ARTIFACTORY_PASSWORD)
+          DEPLOYER_ARTIFACTORY_URL: $(artifactoryBaseUrl)
+          MAVEN_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USER)
+          MAVEN_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASS)
+          DEPLOYER_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USER)
+          DEPLOYER_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASS)
 
     # com.displaynote.dnssd:{dnssd,rxdnssd,rx2dnssd}:<tag>. setup sets the
     # build number to the tag, which becomes PUBLISH_VERSION. rxdnssd and
@@ -113,8 +116,8 @@ stages:
         ndkVersion: '28.2.13676358'
         env:
           PUBLISH_VERSION: $(Build.BuildNumber)
-          DEPLOYER_ARTIFACTORY_URL: $(DEPLOYER_ARTIFACTORY_URL)
-          MAVEN_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USERNAME)
-          MAVEN_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASSWORD)
-          DEPLOYER_ARTIFACTORY_USERNAME: $(DEPLOYER_ARTIFACTORY_USERNAME)
-          DEPLOYER_ARTIFACTORY_PASSWORD: $(DEPLOYER_ARTIFACTORY_PASSWORD)
+          DEPLOYER_ARTIFACTORY_URL: $(artifactoryBaseUrl)
+          MAVEN_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USER)
+          MAVEN_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASS)
+          DEPLOYER_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USER)
+          DEPLOYER_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASS)

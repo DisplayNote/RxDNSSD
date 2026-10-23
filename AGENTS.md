@@ -111,6 +111,6 @@ See `docs/glossary.md` (DNS-SD, mDNS, mDNSResponder, Bindable vs Embedded, Bonjo
 | System | Role | Configured in |
 |---|---|---|
 | Artifactory (DisplayNote) | Maven publish target for `dnssd`/`rxdnssd`/`rx2dnssd` | `publish-root.gradle`, `publish-module.gradle`, credentials via `gradle.properties` or env vars |
-| Build pipeline (Azure DevOps, `ci/azure-pipelines.yml`) | SecretScan + DependencyScan, version, `tests_coverage_java` (JVM tests + JaCoCo, audit mode, roadmap 2.23), `assembleRelease`, publish to Artifactory on tag builds | Templates from `DisplayNote/qt-conan-ci` (`android-gradle/*`) and `DisplayNote/dn-pipeline-templates`; Artifactory URL and credentials from the `artifactoryCredentials` variable group |
+| Build pipeline (Azure DevOps, `ci/azure-pipelines.yml`) | SecretScan + DependencyScan, version, `tests_coverage_java` (JVM tests + JaCoCo, audit mode, roadmap 2.23), `assembleRelease`, publish to Artifactory on tag builds | Templates from `DisplayNote/qt-conan-ci` (`android-gradle/*`) and `DisplayNote/dn-pipeline-templates`; Artifactory credentials (`MAVEN_ARTIFACTORY_USER`/`MAVEN_ARTIFACTORY_PASS`) from the `montage-client-environment-variables` variable group, base URL in the pipeline |
 | GitHub Actions | Docs-sync automation only (roadmap 2.30) — nightly/on-demand documentation upkeep, not build/test CI | `.github/workflows/`, see `tools/docs-sync/README.md` |
 | Android system `mdnsd`/`nsd` daemon | Backing service for `*Bindable` implementations (deprecated API 31+) | No repo config — OS-provided, bound via `Context` at runtime |
