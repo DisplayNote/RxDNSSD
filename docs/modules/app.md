@@ -18,7 +18,7 @@ None — it's an application, not a library. Key classes:
 
 ## Testing in isolation
 
-No dedicated test suite; this module isn't included in the CircleCI `check` reporting steps (`circle.yml` only stores reports for `dnssd`, `rxdnssd`, `rx2dnssd`). Manual verification: build and run on a device/emulator on the same network as another mDNS advertiser (or a second copy of the app registering a service).
+No dedicated test suite; CI (`ci/azure-pipelines.yml`) neither tests nor builds this module — only `dnssd`, `rxdnssd`, `rx2dnssd`. Manual verification: build and run on a device/emulator on the same network as another mDNS advertiser (or a second copy of the app registering a service).
 
 ## Extension points / typical changes
 

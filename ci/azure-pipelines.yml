@@ -1,0 +1,120 @@
+# RxDNSSD build pipeline (roadmap 2.23).
+#
+# Stage order: SecretScan + DependencyScan (in parallel) -> setup (VERSION) ->
+# tests_coverage_java -> gradle_build -> gradle_publish. Every dependency is
+# explicit. gradle_publish runs on tag builds only (tags are the bare version,
+# e.g. 0.9.21 - docs/runbooks/release.md), so branch and PR runs never publish.
+#
+# Gradle 7.0.2 (the wrapper) does not run on JDK 17, so every Gradle stage uses
+# JDK 11. The root build.gradle reads the Artifactory URL and credentials while
+# it is configured, so every Gradle stage gets them through 'env'.
+
+trigger:
+  branches:
+    include:
+    - master
+  tags:
+    include:
+    - '*'
+
+pr:
+  branches:
+    include:
+    - '*'
+  paths:
+    exclude:
+    - docs
+    - README.md
+    - BUILD.md
+  drafts: false
+
+resources:
+  repositories:
+    # 2.5.0 has no Gradle stages yet; they come with the next qt-conan-ci
+    # release. Pin the tag once it is cut.
+    - repository: ci
+      type: github
+      endpoint: "DisplayNote through PAT."
+      name: DisplayNote/qt-conan-ci
+      ref: refs/heads/feature/gradle-coverage
+    # AI Security Roadmap 4.1 - shared secret-scanning (gitleaks) and
+    # dependency-scanning (OSV-Scanner + Grype) templates.
+    - repository: dn-templates
+      type: github
+      endpoint: "DisplayNote through PAT."
+      name: DisplayNote/dn-pipeline-templates
+      ref: refs/tags/v1.1.2
+
+variables:
+  # DisplayNote Artifactory (publish-root.gradle): the read-only user that
+  # resolves dependencies, the deployer user that publishes to
+  # libs-release-local / libs-snapshot-local, and the base URL.
+  - group: artifactoryCredentials
+
+stages:
+    # Both scan stages declare dependsOn: [], so they start together.
+    - template: secret-scan-stage.yml@dn-templates
+      parameters:
+        failOnFindings: false      # audit mode - onboarding only; remove to make the gate blocking
+
+    - template: dependency-scan-stage.yml@dn-templates
+      parameters:
+        failOnFindings: false      # audit mode - remove to make the gate blocking
+        # No Gradle lockfile yet, so OSV-Scanner finds no packages; the
+        # build.gradle inventory covers them (same exception as AB#143382).
+        allowNoPackages: true
+
+    - template: common/setup.yml@ci
+      parameters:
+        dependsOn: [SecretScan, DependencyScan]
+        checkoutSubmodules: false
+
+    # Roadmap 2.23 - JVM unit tests with JaCoCo (docs/runbooks/testing.md).
+    # blocking: false is audit mode: failing tests and a figure below 75% are
+    # warnings; true makes them stop the build and the publish. The unit tests
+    # don't build the native code, so this stage needs no NDK.
+    - template: android-gradle/tests-coverage.yml@ci
+      parameters:
+        enabled: true
+        blocking: false
+        modules: [':dnssd', ':rxdnssd', ':rx2dnssd']
+        jdkVersion: '11'
+        env:
+          DEPLOYER_ARTIFACTORY_URL: $(DEPLOYER_ARTIFACTORY_URL)
+          MAVEN_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USERNAME)
+          MAVEN_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASSWORD)
+          DEPLOYER_ARTIFACTORY_USERNAME: $(DEPLOYER_ARTIFACTORY_USERNAME)
+          DEPLOYER_ARTIFACTORY_PASSWORD: $(DEPLOYER_ARTIFACTORY_PASSWORD)
+
+    # dnssd builds the vendored mDNSResponder with ndk-build; the NDK version
+    # is the ndkVersion pinned in dnssd/build.gradle.
+    - template: android-gradle/build.yml@ci
+      parameters:
+        dependsOn: [setup, tests_coverage_java]
+        tasks: ':dnssd:assembleRelease :rxdnssd:assembleRelease :rx2dnssd:assembleRelease'
+        jdkVersion: '11'
+        ndkVersion: '28.2.13676358'
+        env:
+          DEPLOYER_ARTIFACTORY_URL: $(DEPLOYER_ARTIFACTORY_URL)
+          MAVEN_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USERNAME)
+          MAVEN_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASSWORD)
+          DEPLOYER_ARTIFACTORY_USERNAME: $(DEPLOYER_ARTIFACTORY_USERNAME)
+          DEPLOYER_ARTIFACTORY_PASSWORD: $(DEPLOYER_ARTIFACTORY_PASSWORD)
+
+    # com.displaynote.dnssd:{dnssd,rxdnssd,rx2dnssd}:<tag>. setup sets the
+    # build number to the tag, which becomes PUBLISH_VERSION. rxdnssd and
+    # rx2dnssd keep api project(':dnssd'); their POMs still name
+    # com.displaynote.dnssd:dnssd:<tag>, so no local/published toggle is needed.
+    - template: android-gradle/publish.yml@ci
+      parameters:
+        tagPrefix: ''
+        tasks: ':dnssd:publish :rxdnssd:publish :rx2dnssd:publish'
+        jdkVersion: '11'
+        ndkVersion: '28.2.13676358'
+        env:
+          PUBLISH_VERSION: $(Build.BuildNumber)
+          DEPLOYER_ARTIFACTORY_URL: $(DEPLOYER_ARTIFACTORY_URL)
+          MAVEN_ARTIFACTORY_USERNAME: $(MAVEN_ARTIFACTORY_USERNAME)
+          MAVEN_ARTIFACTORY_PASSWORD: $(MAVEN_ARTIFACTORY_PASSWORD)
+          DEPLOYER_ARTIFACTORY_USERNAME: $(DEPLOYER_ARTIFACTORY_USERNAME)
+          DEPLOYER_ARTIFACTORY_PASSWORD: $(DEPLOYER_ARTIFACTORY_PASSWORD)
