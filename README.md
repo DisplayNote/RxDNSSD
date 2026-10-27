@@ -272,7 +272,8 @@ The `tests_coverage_java` stage reports JaCoCo line coverage of `dnssd`, `rxdnss
 The exclusions are reviewed quarterly.
 
 License
--------	Copyright (C) 2022 Andriy Druk
+-------
+	Copyright (C) 2022 Andriy Druk
 
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.

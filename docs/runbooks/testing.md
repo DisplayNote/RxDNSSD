@@ -12,7 +12,7 @@ Unit tests only, organized per module (`dnssd`, `rxdnssd`, `rx2dnssd`) — no in
 
 - `DnssdTest`, `MulticastLockTest`, `RxDnssdTest`, `Rx2DnssdTest` — the public entry points, with the native layer mocked through PowerMock.
 - `TXTRecordTest` — the TXT wire format (length-prefixed `key=value`), key lookup ignoring case, replace in place, remove, the 255-byte limit, and `DNSSD.parseTXTRecords`.
-- `AppleDNSSDExceptionTest` — the `DNS-SD Error <code>: <NAME>` message for every known error code.
+- `AppleDNSSDExceptionTest` — the `DNS-SD Error <code>: <NAME>` message for representative codes (first, middle and last of the table) and the message for a code outside it.
 - `BonjourServiceTest` (same file in both Rx modules, as `BonjourService` is duplicated) — builder and copy builder, equality on name/type/domain/interface only, `isLost`, IPv4/IPv6 lookup, unmodifiable records and addresses, `toString`. `Parcelable` is not covered (needs Android).
 - `Rx*RegisterListenerTest`, `Rx*QueryListenerTest` — the stream events for each callback: emitted service, A/AAAA/TXT answers accumulating on one service, completion, errors, and nothing emitted once cancelled/unsubscribed.
 
