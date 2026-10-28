@@ -24,7 +24,8 @@ RxDNSSD is an Android library set implementing a DNS-SD/mDNS (Bonjour/Zeroconf) 
 ├── rx2dnssd/     RxJava 2 wrapper over dnssd. Use this for new integrations.
 ├── docs/         architecture.md, per-module docs, runbooks, glossary (this doc set).
 ├── BUILD.md      Local-build and publish toggle instructions.
-└── circle.yml    CircleCI config (build/test CI; see .github/workflows/ for docs-sync automation).
+├── ci/azure-pipelines.yml  Build pipeline: scans, version, JVM tests + JaCoCo, assembleRelease, publish on tags.
+└── jacoco-module.gradle    JaCoCo report task applied by dnssd, rxdnssd and rx2dnssd.
 ```
 
 Full per-module detail: `docs/modules/dnssd.md`, `docs/modules/rxdnssd.md`, `docs/modules/rx2dnssd.md`, `docs/modules/app.md`.
@@ -37,8 +38,16 @@ Prerequisites: Android SDK, NDK 28.2.13676358, JDK 11–16 (Gradle 7.0.2's wrapp
 ./gradlew clean build     # full build, all 4 modules
 ./gradlew test            # unit tests, all modules
 ./gradlew :dnssd:test      # single module
-./gradlew check            # what CircleCI runs
+./gradlew check            # unit tests + lint
+
+# Unit tests + JaCoCo line coverage, as CI runs them (per module; report under
+#   <module>/build/reports/jacoco/jacocoTestReport/)
+./gradlew :dnssd:testDebugUnitTest
+./gradlew :dnssd:jacocoTestReport -x :dnssd:testDebugUnitTest
 ```
+
+Gradle needs the Artifactory variables just to configure (`publish-root.gradle`); for a local test
+run without Artifactory access, any non-empty values work — see `docs/runbooks/testing.md`.
 
 Before your first local build, read `BUILD.md` — `rxdnssd`/`rx2dnssd` ship with `api project(':dnssd')` active (correct for local dev), which must be swapped for a Maven coordinate before publishing (`docs/runbooks/release.md`).
 
@@ -64,7 +73,7 @@ Full diagrams (C4 + sequence): `docs/architecture.md`.
 - Package-private `Internal*` classes (`InternalDNSSD`, `InternalBrowseListener`, …) are native-method plumbing, never part of the public API surface — don't call them from outside `dnssd`.
 - Public API types (`DNSSD` abstract class; `RxDnssd`, `Rx2Dnssd` interfaces) are documented with Javadoc `@param`/`@return`; match that style when adding methods.
 - `@Deprecated` methods (e.g. `queryRecords()` in both Rx wrappers, replaced by `queryIPRecords()`) are kept, not removed, for binary compatibility — follow that pattern rather than breaking existing consumers.
-- Tests: one JUnit4 test class per public entry point, using Mockito + PowerMock to stub native calls (`docs/runbooks/testing.md`).
+- Tests: JUnit4. The entry-point tests (`DnssdTest`, `RxDnssdTest`, `Rx2DnssdTest`) use Mockito + PowerMock to stub native calls; pure-Java classes (`TXTRecord`, `BonjourService`, the Rx listeners) get plain JUnit + Mockito tests named after the behaviour (`docs/runbooks/testing.md`). Every change gets a JVM unit test.
 - Apache 2.0 license header on every source file — copy an existing file's header verbatim into new files.
 
 ## Patterns to follow / anti-patterns to avoid
@@ -80,7 +89,7 @@ Full diagrams (C4 + sequence): `docs/architecture.md`.
 |---|---|---|
 | A new DNS-SD primitive (Java-level) | `dnssd/.../DNSSD.java` + both implementations | See `docs/modules/dnssd.md` |
 | A new Rx operator/query (RxJava2) | `rx2dnssd/.../Rx2Dnssd.java` + `Rx2DnssdBindable`/`Rx2DnssdEmbedded` | Then port to `rxdnssd` — see `docs/modules/rx2dnssd.md` |
-| A unit test | `<module>/src/test/java/.../<Module>Test.java` | Mockito + PowerMock, see `docs/runbooks/testing.md` |
+| A unit test | `<module>/src/test/java/.../<Class>Test.java` | Plain JUnit + Mockito where possible, PowerMock only for native/static calls; see `docs/runbooks/testing.md` |
 | A sample UI flow | `app/src/main/java/.../MainActivity.java` | Extend existing activity unless a new flow is genuinely separate |
 | A native/JNI change | `dnssd/src/main/jni/JNISupport.c` + `DNSSD.java.h` | Never touch `mdnsresponder/` except for deliberate upstream sync |
 
@@ -91,7 +100,7 @@ Full diagrams (C4 + sequence): `docs/architecture.md`.
 - **Two coordinate spaces**: historical Maven Central releases used `com.github.andriydruk`; this fork publishes as `com.displaynote.dnssd` (`publish-root.gradle`). Don't assume version numbers or artifact history are shared between the two.
 - **`DNSSDBindable`/`Rx*DnssdBindable` deprecated by the OS** on `targetSDK 31`+ (Android 12) — new integrations should default to the Embedded variants.
 - **Windows `JAVA_HOME` quoting bug**: see `docs/runbooks/troubleshooting.md` — a quoted env var value can make Gradle report a valid JDK directory as invalid.
-- **Build/test CI stays CircleCI-only**: `circle.yml` is the only CI for building and testing code. `.github/workflows/` holds the docs-sync automation (roadmap 2.30) — nightly/on-demand documentation upkeep, not build or test CI.
+- **Build/test CI is Azure Pipelines**: `ci/azure-pipelines.yml` runs the JVM unit tests with JaCoCo coverage, builds the release AARs (NDK 28.2) and publishes them on tag builds. The upstream `circle.yml` was removed (it never ran on this fork). `.github/workflows/` holds the docs-sync automation (roadmap 2.30) — nightly/on-demand documentation upkeep, not build or test CI.
 
 ## Glossary
 
@@ -102,6 +111,6 @@ See `docs/glossary.md` (DNS-SD, mDNS, mDNSResponder, Bindable vs Embedded, Bonjo
 | System | Role | Configured in |
 |---|---|---|
 | Artifactory (DisplayNote) | Maven publish target for `dnssd`/`rxdnssd`/`rx2dnssd` | `publish-root.gradle`, `publish-module.gradle`, credentials via `gradle.properties` or env vars |
-| CircleCI | CI: `androidDependencies` + `check`, uploads test reports | `circle.yml` |
+| Build pipeline (Azure DevOps, `ci/azure-pipelines.yml`) | SecretScan + DependencyScan, version, `tests_coverage_java` (JVM tests + JaCoCo, audit mode, roadmap 2.23), `assembleRelease`, publish to Artifactory on tag builds | Templates from `DisplayNote/qt-conan-ci` (`android-gradle/*`) and `DisplayNote/dn-pipeline-templates`; Artifactory credentials (`MAVEN_ARTIFACTORY_USER`/`MAVEN_ARTIFACTORY_PASS`) from the `montage-client-environment-variables` variable group, base URL in the pipeline |
 | GitHub Actions | Docs-sync automation only (roadmap 2.30) — nightly/on-demand documentation upkeep, not build/test CI | `.github/workflows/`, see `tools/docs-sync/README.md` |
 | Android system `mdnsd`/`nsd` daemon | Backing service for `*Bindable` implementations (deprecated API 31+) | No repo config — OS-provided, bound via `Context` at runtime |

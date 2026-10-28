@@ -10,7 +10,7 @@ Please support Ukraine by lobbying your governments, protesting peacefully, and 
 * [Donate to KOLO](https://koloua.com/en/)
 * [Donate to Prytula Foundation](https://prytulafoundation.org/en)
 
-# Android mDNSResponder [![Circle CI](https://circleci.com/gh/andriydruk/RxDNSSD.svg?style=shield&circle-token=5f0cb1ee907a20bdb08aa4b073b5690afbaaabe1)](https://circleci.com/gh/andriydruk/RxDNSSD) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/dnssd?label=DNSSD)](https://search.maven.org/artifact/com.github.andriydruk/dnssd) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/rxdnssd?label=RxDNSSD)](https://search.maven.org/artifact/com.github.andriydruk/rxdnssd) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/rx2dnssd?label=Rx2DNSSD) ](https://search.maven.org/artifact/com.github.andriydruk/rx2dnssd)
+# Android mDNSResponder [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/dnssd?label=DNSSD)](https://search.maven.org/artifact/com.github.andriydruk/dnssd) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/rxdnssd?label=RxDNSSD)](https://search.maven.org/artifact/com.github.andriydruk/rxdnssd) [![Download](https://img.shields.io/maven-central/v/com.github.andriydruk/rx2dnssd?label=Rx2DNSSD) ](https://search.maven.org/artifact/com.github.andriydruk/rx2dnssd)
 
 
 ## Why I created this library?
@@ -248,6 +248,28 @@ browseDisposable = rxDnssd.browse("_http._tcp", "local.")
             }
         }, throwable -> Log.e("TAG", "error", throwable));
 ```
+
+## Testing
+
+JVM unit tests run with `./gradlew test` (JDK 11–16); CI runs them with JaCoCo coverage in
+`ci/azure-pipelines.yml`. See [`docs/runbooks/testing.md`](docs/runbooks/testing.md).
+
+## Coverage scope
+
+The `tests_coverage_java` stage reports JaCoCo line coverage of `dnssd`, `rxdnssd` and `rx2dnssd`
+(roadmap 2.23, target 75%).
+
+- **Measured:** the classes of the three libraries compiled for the debug build type
+  (`<module>/src/main/java`), exercised by the JVM unit tests, including the tests that run under
+  PowerMock (the classes are instrumented offline).
+- **Excluded:** generated `R`, `BuildConfig` and manifest classes, the `app` sample module, and the
+  native mDNSResponder core and JNI glue (`dnssd/src/main/jni`, C, not measured by JaCoCo).
+- **Not executed in the current lane:** code that needs the native library or Android: the `Apple*`
+  JNI classes and `InternalDNSSD` (mocked in `DnssdTest`), `DNSSDEmbedded`'s native thread,
+  `BonjourService`'s `Parcelable` code, and the Bindable/Embedded factory classes.
+  `DNSSDEmbeddedTest` is `@Ignore`d. There are no instrumented tests.
+
+The exclusions are reviewed quarterly.
 
 License
 -------

@@ -13,6 +13,10 @@ android {
     }
 
     buildTypes {
+        debug {
+            // JaCoCo data for the JVM unit tests (roadmap 2.23, jacoco-module.gradle).
+            testCoverageEnabled true
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
@@ -58,3 +62,4 @@ ext {
 }
 
 apply from: "${rootProject.projectDir}/publish-module.gradle"
+apply from: "${rootProject.projectDir}/jacoco-module.gradle"

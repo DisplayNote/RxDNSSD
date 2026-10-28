@@ -6,7 +6,8 @@ Claude Code-specific guide. Full detail in `AGENTS.md` — read that first for a
 
 ## DO
 
-- DO run `./gradlew :dnssd:test`, `:rxdnssd:test`, `:rx2dnssd:test` (as relevant) after touching any of those modules — no CI runs on your behalf until push.
+- DO run `./gradlew :dnssd:test`, `:rxdnssd:test`, `:rx2dnssd:test` (as relevant) after touching any of those modules — CI (`ci/azure-pipelines.yml`) only runs them after push.
+- DO add a JVM unit test for every change (JUnit 4, Mockito for doubles, PowerMock only for native/static calls), named after the behaviour it checks — `docs/runbooks/testing.md`.
 - DO implement any new `Rx2Dnssd` operation in **both** `Rx2DnssdBindable` and `Rx2DnssdEmbedded`, then port it to `RxDnssd`/`RxDnssdBindable`/`RxDnssdEmbedded` — see `docs/modules/rx2dnssd.md`.
 - DO keep `@Deprecated` methods in place (e.g. `queryRecords()`) — binary compatibility for existing consumers, don't delete them.
 - DO copy the existing Apache 2.0 header into any new source file.
@@ -29,7 +30,12 @@ If `./gradlew` reports `JAVA_HOME is set to an invalid directory` on Windows/Git
 ```bash
 ./gradlew clean build   # full build
 ./gradlew test          # all unit tests
-./gradlew check         # what CI runs
+./gradlew check         # unit tests + lint
+./gradlew :dnssd:testDebugUnitTest && ./gradlew :dnssd:jacocoTestReport -x :dnssd:testDebugUnitTest
+                        # tests + JaCoCo coverage, as CI runs them (per module)
 ```
+
+CI: `ci/azure-pipelines.yml` (Azure DevOps) — scans, JVM tests + JaCoCo (audit mode), release AARs,
+publish to Artifactory on tag builds.
 
 See `AGENTS.md` for the repository map, architecture diagrams, and the full "Where to add X" table.

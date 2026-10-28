@@ -1,0 +1,31 @@
+// JaCoCo line coverage of a library module's JVM unit tests (roadmap 2.23, docs/runbooks/testing.md).
+// Applied by dnssd, rxdnssd and rx2dnssd, like publish-module.gradle. Each of them sets
+// testCoverageEnabled on the debug build type: AGP 7.0 then instruments the debug classes offline
+// and testDebugUnitTest writes build/outputs/unit_test_code_coverage/debugUnitTest/*.exec.
+// Offline instrumentation also counts code run under the PowerMock runner, which reloads the
+// classes under test in its own class loader. The XML report is read by the pipeline's tests_coverage_java stage.
+apply plugin: 'jacoco'
+
+// One JaCoCo version for AGP's offline instrumentation and Gradle's test agent. With two versions
+// the instrumented classes start their own runtime (output=none) and the .exec stays empty.
+def jacocoToolVersion = '0.8.7'
+jacoco {
+    toolVersion = jacocoToolVersion
+}
+android {
+    testCoverage {
+        jacocoVersion = jacocoToolVersion
+    }
+}
+
+tasks.register('jacocoTestReport', JacocoReport) {
+    dependsOn 'testDebugUnitTest'
+    reports {
+        xml.required = true
+        html.required = true
+    }
+    def generated = ['**/R.class', '**/R$*.class', '**/BuildConfig.*', '**/Manifest*.*']
+    classDirectories.from = fileTree(dir: "$buildDir/intermediates/javac/debug/classes", excludes: generated)
+    sourceDirectories.from = files('src/main/java')
+    executionData.from = fileTree(dir: buildDir, includes: ['outputs/unit_test_code_coverage/debugUnitTest/*.exec'])
+}
