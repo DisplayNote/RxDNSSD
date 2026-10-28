@@ -113,6 +113,16 @@ stages:
         tasks: ':dnssd:publish :rxdnssd:publish :rx2dnssd:publish'
         jdkVersion: '11'
         ndkVersion: '28.2.13676358'
+        # The tag becomes the published version, so only a bare x.y.z tag (the
+        # format of every RxDNSSD release, e.g. 0.9.21) may publish: a v- or
+        # j-prefixed tag would otherwise publish version v0.9.22.
+        preBuildScript: |
+          set -eu
+          tag="${BUILD_SOURCEBRANCH#refs/tags/}"
+          if ! printf '%s' "$tag" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "##vso[task.logissue type=error]Tag $tag is not a bare x.y.z version; RxDNSSD releases are tagged e.g. 0.9.21"
+            exit 1
+          fi
         env:
           PUBLISH_VERSION: $(Build.BuildNumber)
           DEPLOYER_ARTIFACTORY_URL: $(artifactoryBaseUrl)
