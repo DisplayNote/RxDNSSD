@@ -35,7 +35,8 @@ resources:
       type: github
       endpoint: "DisplayNote through PAT."
       name: DisplayNote/qt-conan-ci
-      ref: refs/tags/2.6.0
+      # 2.8.0 publishes only on a release tag in the repository's format.
+      ref: refs/tags/2.8.0
     # AI Security Roadmap 4.1 - shared secret-scanning (gitleaks) and
     # dependency-scanning (OSV-Scanner + Grype) templates.
     - repository: dn-templates
@@ -109,6 +110,8 @@ stages:
     # com.displaynote.dnssd:dnssd:<tag>, so no local/published toggle is needed.
     - template: android-gradle/publish.yml@ci
       parameters:
+        # Java-only repository: a bare <version> tag publishes, any other tag
+        # skips this stage.
         tagPrefix: ''
         tasks: ':dnssd:publish :rxdnssd:publish :rx2dnssd:publish'
         jdkVersion: '11'
