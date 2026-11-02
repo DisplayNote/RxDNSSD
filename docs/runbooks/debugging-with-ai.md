@@ -91,7 +91,10 @@ for that run.
 
 Redacted irreversibly: private keys, JWTs, auth headers, URL credentials,
 cloud/API keys, any `password= / token= / secret= / *_key=` value, OAuth
-`code=`/`state=`/`nonce=` in URLs.
+`code=`/`state=`/`nonce=` in URLs, and the content of XMPP credential elements
+(SASL `<auth>`/`<challenge>`/`<response>`/`<success>`, `<password>`, the
+`jabber:iq:auth` `<digest>`, credential-named upload `<header>` values) when the
+payload starts on the line of its opening tag.
 Pseudonymised consistently: e-mails, quoted/keyed names (people, devices,
 computers), keyed ids (serial, deviceId, session, meetingId, roomPin, tenantId,
 licence…), Android `getprop` serials, Wi-Fi SSIDs, IPv4/IPv6, MACs, UUIDs, phone
