@@ -70,4 +70,4 @@ Put tests in the module's `src/test/java`, in the package of the class under tes
 
 ## CI
 
-Azure Pipelines (`ci/azure-pipelines.yml`): SecretScan + DependencyScan, version, `tests_coverage_java` (above), `assembleRelease` of the three libraries (NDK 28.2.13676358), and `publish` to Artifactory on tag builds only. The upstream `circle.yml` was removed: it never ran on this fork. `.github/workflows/` holds the docs-sync automation (roadmap 2.30, nightly/on-demand documentation upkeep) rather than build or test CI — see `tools/docs-sync/README.md`.
+Azure Pipelines (`ci/azure-pipelines.yml`): SecretScan + DependencyScan (both blocking: findings fail the build), version, `tests_coverage_java` (above), `assembleRelease` of the three libraries (NDK 28.2.13676358), and `publish` to Artifactory on tag builds only. The upstream `circle.yml` was removed: it never ran on this fork. `.github/workflows/` holds the docs-sync automation (roadmap 2.30, nightly/on-demand documentation upkeep) rather than build or test CI — see `tools/docs-sync/README.md`.
