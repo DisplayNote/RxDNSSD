@@ -94,5 +94,5 @@ NDK version is pinned per-module in `build.gradle` (`ndkVersion "28.2.13676358"`
 
 ## Active decisions
 
-- **Local vs published dependency switch** (`BUILD.md`): `rxdnssd/build.gradle` and `rx2dnssd/build.gradle` both declare `dnssd` as `api project(':dnssd')` for local builds; the commented-out alternative (`api "${rootProject.ext.groupId}:dnssd:${version}"`) is swapped in manually before publishing. There is no automated toggle — this is a manual, error-prone step, see Gotchas in `AGENTS.md`.
+- **Local vs published dependency switch** (`BUILD.md`): `rxdnssd/build.gradle` and `rx2dnssd/build.gradle` both declare `dnssd` as `api project(':dnssd')` for local builds; the commented-out alternative (`api "${rootProject.ext.groupId}:dnssd:${version}"`) is swapped in manually only for a workstation publish; CI tag publishes (`ci/azure-pipelines.yml`) keep `api project(':dnssd')`. There is no automated toggle — this is a manual, error-prone step, see Gotchas in `AGENTS.md`.
 - **Group ID migration**: `groupId` in `publish-root.gradle` is `com.displaynote.dnssd` (internal Artifactory fork), while historical Maven Central releases used `com.github.andriydruk` (see `README.md` badges). The two coordinate spaces are not interchangeable.

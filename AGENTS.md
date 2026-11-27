@@ -49,7 +49,7 @@ Prerequisites: Android SDK, NDK 28.2.13676358, JDK 11–16 (Gradle 7.0.2's wrapp
 Gradle needs the Artifactory variables just to configure (`publish-root.gradle`); for a local test
 run without Artifactory access, any non-empty values work — see `docs/runbooks/testing.md`.
 
-Before your first local build, read `BUILD.md` — `rxdnssd`/`rx2dnssd` ship with `api project(':dnssd')` active (correct for local dev), which must be swapped for a Maven coordinate before publishing (`docs/runbooks/release.md`).
+Before your first local build, read `BUILD.md` — `rxdnssd`/`rx2dnssd` ship with `api project(':dnssd')` active (correct for local dev), which must be swapped for a Maven coordinate only when publishing from a workstation (CI tag publishes need no swap) (`docs/runbooks/release.md`).
 
 No standalone lint/format command beyond `lintOptions { abortOnError false }` in `app/build.gradle` (lint failures don't fail the build).
 
@@ -95,7 +95,7 @@ Full diagrams (C4 + sequence): `docs/architecture.md`.
 
 ## Gotchas
 
-- **Manual publish toggle**: `rxdnssd`/`rx2dnssd` `build.gradle` files require hand-editing between `api project(':dnssd')` (local) and a Maven coordinate (publish) — no automated switch, easy to publish against a stale `dnssd` artifact or forget to revert. See `docs/runbooks/release.md`.
+- **Manual publish toggle (workstation releases only)**: CI tag publishes keep `api project(':dnssd')` and need no toggle (the POMs already name `com.displaynote.dnssd:dnssd:<tag>`). A publish from a workstation per `BUILD.md` still hand-edits `rxdnssd`/`rx2dnssd` `build.gradle` between `api project(':dnssd')` and a Maven coordinate — no automated switch, easy to publish against a stale `dnssd` artifact or forget to revert. See `docs/runbooks/release.md`.
 - **Vendored native core**: `dnssd/src/main/jni/mdnsresponder/` is third-party Apple source (includes unused mDNSWindows/Clients trees) — treat as read-only except for controlled upstream syncs.
 - **Two coordinate spaces**: historical Maven Central releases used `com.github.andriydruk`; this fork publishes as `com.displaynote.dnssd` (`publish-root.gradle`). Don't assume version numbers or artifact history are shared between the two.
 - **`DNSSDBindable`/`Rx*DnssdBindable` deprecated by the OS** on `targetSDK 31`+ (Android 12) — new integrations should default to the Embedded variants.

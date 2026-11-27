@@ -24,4 +24,4 @@ Check the NDK version installed matches `ndkVersion "28.2.13676358"` in `dnssd/b
 
 ## Publishing pushes the wrong `dnssd` version (project vs. Maven coordinate)
 
-Check whether `rxdnssd/build.gradle` / `rx2dnssd/build.gradle` still have `api project(':dnssd')` active instead of the Maven-coordinate line — see `docs/runbooks/release.md` step 2. This is a manual toggle with no build-time guard.
+Check whether `rxdnssd/build.gradle` / `rx2dnssd/build.gradle` still have `api project(':dnssd')` active instead of the Maven-coordinate line — see `docs/runbooks/release.md` step 2. This is a manual toggle with no build-time guard (workstation publishes only; CI tag publishes keep the project dependency and their POMs still name the published `dnssd`).

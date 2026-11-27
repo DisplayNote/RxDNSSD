@@ -11,7 +11,7 @@ Claude Code-specific guide. Full detail in `AGENTS.md` — read that first for a
 - DO implement any new `Rx2Dnssd` operation in **both** `Rx2DnssdBindable` and `Rx2DnssdEmbedded`, then port it to `RxDnssd`/`RxDnssdBindable`/`RxDnssdEmbedded` — see `docs/modules/rx2dnssd.md`.
 - DO keep `@Deprecated` methods in place (e.g. `queryRecords()`) — binary compatibility for existing consumers, don't delete them.
 - DO copy the existing Apache 2.0 header into any new source file.
-- DO read `BUILD.md` before your first build — `rxdnssd`/`rx2dnssd` default to `api project(':dnssd')`, which must be swapped to a Maven coordinate before publish (`docs/runbooks/release.md`).
+- DO read `BUILD.md` before your first build — `rxdnssd`/`rx2dnssd` default to `api project(':dnssd')`, which must be swapped to a Maven coordinate only for a workstation publish (CI tag publishes need no swap) (`docs/runbooks/release.md`).
 
 ## DON'T
 
